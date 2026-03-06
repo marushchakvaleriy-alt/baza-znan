@@ -3,6 +3,7 @@ import { Sidebar as Layout } from './components/Layout';
 import { Handbook } from './pages/Handbook';
 import { Login } from './pages/Login';
 import { Tools } from './pages/Tools';
+import { AdminDashboard } from './pages/AdminDashboard';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
@@ -15,8 +16,13 @@ function App() {
         </ProtectedRoute>
       }>
         <Route index element={<Navigate to="/tools" replace />} />
-        <Route path="handbook" element={<Handbook />} />
+        <Route path="section/:sectionId" element={<Handbook />} />
         <Route path="tools" element={<Tools />} />
+        <Route path="admin" element={
+          <ProtectedRoute requireAdmin>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
       </Route>
     </Routes>
   );

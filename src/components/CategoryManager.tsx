@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { categoryService, type Category } from '../services/categories';
+import { sectionService, type Section } from '../services/sections';
 import { GripVertical, Edit, Trash2, X, Save } from 'lucide-react';
 
 export function CategoryManager() {
     const [categories, setCategories] = useState<Category[]>([]);
+    const [sections, setSections] = useState<Section[]>([]);
     const [loading, setLoading] = useState(true);
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [formData, setFormData] = useState({ id: '', label: '', color: '' });
+    const [formData, setFormData] = useState({ id: '', label: '', color: '', sectionId: '' });
     const [draggedItem, setDraggedItem] = useState<Category | null>(null);
 
     const colorOptions = [
@@ -25,8 +27,12 @@ export function CategoryManager() {
     const loadCategories = async () => {
         setLoading(true);
         try {
-            const data = await categoryService.getAll();
+            const [data, secData] = await Promise.all([
+                categoryService.getAll(),
+                sectionService.getAll()
+            ]);
             setCategories(data);
+            setSections(secData);
         } catch (error) {
             console.error('Error loading categories:', error);
             alert('Помилка завантаження категорій');
@@ -36,8 +42,8 @@ export function CategoryManager() {
     };
 
     const handleSave = async () => {
-        if (!formData.id.trim() || !formData.label.trim() || !formData.color) {
-            alert('Заповніть всі поля');
+        if (!formData.id.trim() || !formData.label.trim() || !formData.color || !formData.sectionId) {
+            alert('Заповніть всі поля, включаючи розділ');
             return;
         }
 
@@ -52,6 +58,7 @@ export function CategoryManager() {
                 id,
                 label: formData.label,
                 color: formData.color,
+                sectionId: formData.sectionId,
                 order: existingCategory?.order || Date.now(),
                 // Keep existing createdAt or let service handle it (service sets it if missing)
                 createdAt: existingCategory?.createdAt
@@ -62,7 +69,7 @@ export function CategoryManager() {
 
             // Reset form
             setEditingId(null);
-            setFormData({ id: '', label: '', color: '' });
+            setFormData({ id: '', label: '', color: '', sectionId: '' });
             loadCategories();
         } catch (error: any) {
             console.error(error);
@@ -73,7 +80,7 @@ export function CategoryManager() {
     const handleEdit = (category: Category, e?: React.MouseEvent) => {
         if (e) e.stopPropagation();
         setEditingId(category.id);
-        setFormData({ id: category.id, label: category.label, color: category.color });
+        setFormData({ id: category.id, label: category.label, color: category.color, sectionId: category.sectionId || '' });
 
         // Scroll to form to ensure user sees validation/input area
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -140,7 +147,23 @@ export function CategoryManager() {
                     {editingId ? 'Редагувати категорію' : 'Додати категорію'}
                 </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                            Розділ
+                        </label>
+                        <select
+                            value={formData.sectionId}
+                            onChange={(e) => setFormData({ ...formData, sectionId: e.target.value })}
+                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                        >
+                            <option value="">Оберіть...</option>
+                            {sections.map(s => (
+                                <option key={s.id} value={s.id}>{s.label}</option>
+                            ))}
+                        </select>
+                    </div>
+
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">
                             ID (англійською)
@@ -197,7 +220,7 @@ export function CategoryManager() {
                         <button
                             onClick={() => {
                                 setEditingId(null);
-                                setFormData({ id: '', label: '', color: '' });
+                                setFormData({ id: '', label: '', color: '', sectionId: '' });
                             }}
                             className="flex items-center gap-2 bg-slate-200 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-300 transition"
                         >
@@ -240,7 +263,11 @@ export function CategoryManager() {
                                 {category.label}
                             </span>
 
-                            <span className="text-xs text-slate-400 font-mono flex-1">
+                            <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded hidden md:inline-block">
+                                Розділ: {sections.find(s => s.id === category.sectionId)?.label || category.sectionId || 'Немає'}
+                            </span>
+
+                            <span className="text-xs text-slate-400 font-mono flex-1 text-right">
                                 ID: {category.id}
                             </span>
 

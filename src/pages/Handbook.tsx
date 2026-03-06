@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Search, BookOpen, Plus, Loader2, Trash2, Edit } from 'lucide-react';
+import { useParams } from 'react-router-dom';
 import type { Article } from '../data/handbook';
 import { Modal } from '../components/ui/Modal';
 import { ArticleEditor } from '../components/ArticleEditor';
 import { useAuth } from '../context/AuthContext';
 import { articleService } from '../services/articles';
 import { categoryService, type Category } from '../services/categories';
+import { sectionService, type Section } from '../services/sections';
 
 export function Handbook() {
+    const { sectionId } = useParams<{ sectionId: string }>();
     const { isAdmin } = useAuth();
     const [filter, setFilter] = useState('all');
     const [search, setSearch] = useState('');
     const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
     const [showEditor, setShowEditor] = useState(false);
     const [articleToEdit, setArticleToEdit] = useState<Article | undefined>(undefined);
+    const [section, setSection] = useState<Section | null>(null);
 
     const [articles, setArticles] = useState<Article[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -22,9 +26,13 @@ export function Handbook() {
     const [showSlowLoadingMessage, setShowSlowLoadingMessage] = useState(false);
 
     useEffect(() => {
+        setFilter('all'); // Reset filter when section changes
         loadArticles();
         loadCategories();
-    }, []);
+        if (sectionId) {
+            sectionService.getById(sectionId).then(setSection).catch(console.error);
+        }
+    }, [sectionId]);
 
     useEffect(() => {
         let timer: ReturnType<typeof setTimeout>;
@@ -67,10 +75,15 @@ export function Handbook() {
     };
 
     const filtered = articles.filter(a => {
+        // Filter by current section
+        if (sectionId && a.sectionId !== sectionId) return false;
         const matchesCategory = filter === 'all' || a.category === filter;
         const matchesSearch = a.title.toLowerCase().includes(search.toLowerCase());
         return matchesCategory && matchesSearch;
     });
+
+    // Only show categories that belong to this section
+    const sectionCategories = categories.filter(c => !sectionId || c.sectionId === sectionId);
 
     const handleEdit = (article: Article, e: React.MouseEvent) => {
         e.stopPropagation(); // Prevent opening article modal
@@ -131,7 +144,7 @@ export function Handbook() {
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
                 <div className="flex justify-between items-center mb-4">
                     <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-                        <BookOpen className="text-purple-600" /> База Знань
+                        <BookOpen className="text-purple-600" /> {section?.label || 'База Знань'}
                     </h1>
                     {isAdmin && (
                         <button
@@ -163,7 +176,7 @@ export function Handbook() {
                         >
                             Всі
                         </button>
-                        {categories.map(category => (
+                        {sectionCategories.map(category => (
                             <button
                                 key={category.id}
                                 onClick={() => setFilter(category.id)}

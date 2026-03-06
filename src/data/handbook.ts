@@ -7,6 +7,7 @@ export type ContentBlock = {
 
 export type Article = {
     id: string;
+    sectionId?: string;
     title: string;
     category: string;
     icon?: any;

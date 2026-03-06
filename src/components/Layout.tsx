@@ -1,21 +1,23 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { Calculator, BookOpen, LogOut, Menu, X } from 'lucide-react';
+import { Calculator, BookOpen, LogOut, Menu, X, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { sectionService, type Section } from '../services/sections';
 
 export function cn(...inputs: (string | undefined | null | false)[]) {
     return twMerge(clsx(inputs));
 }
 
 export function Sidebar() {
-    const [isOpen, setIsOpen] = React.useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const [sections, setSections] = useState<Section[]>([]);
     const { user, signOut, isAdmin } = useAuth();
-    const navItems = [
-        { to: '/tools', icon: Calculator, label: 'Інструменти' },
-        { to: '/handbook', icon: BookOpen, label: 'База Знань' }
-    ];
+
+    useEffect(() => {
+        sectionService.getAll().then(setSections).catch(console.error);
+    }, []);
 
     return (
         <>
@@ -42,17 +44,38 @@ export function Sidebar() {
             )}>
                 <div className="p-6 border-b border-slate-800 shrink-0">
                     <h1 className="text-xl font-bold flex items-center gap-2">
-                        <Calculator className="text-blue-500" />
-                        <span>Engineer Pro</span>
+                        <BookOpen className="text-blue-500" />
+                        <span>База Знань</span>
                     </h1>
-                    <p className="text-xs text-slate-400 mt-1">Довідник Проєктанта</p>
+                    <p className="text-xs text-slate-400 mt-1">Довідник Проєктанта ВіЯр</p>
                 </div>
 
-                <nav className="p-4 space-y-2 flex-1 overflow-y-auto">
-                    {navItems.map((item) => (
+                <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
+                    {/* Fixed item: Tools */}
+                    <NavLink
+                        to="/tools"
+                        onClick={() => setIsOpen(false)}
+                        className={({ isActive }) => cn(
+                            "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
+                            isActive
+                                ? "bg-blue-600 text-white shadow-lg shadow-blue-900/20"
+                                : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                        )}
+                    >
+                        <Calculator size={20} className="shrink-0" />
+                        <span className="font-medium truncate">Інструменти</span>
+                    </NavLink>
+
+                    {/* Dynamic sections from Firestore */}
+                    {sections.length > 0 && (
+                        <div className="mt-3 mb-1">
+                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-4 py-1">База Знань</p>
+                        </div>
+                    )}
+                    {sections.map((section) => (
                         <NavLink
-                            key={item.to}
-                            to={item.to}
+                            key={section.id}
+                            to={`/section/${section.id}`}
                             onClick={() => setIsOpen(false)}
                             className={({ isActive }) => cn(
                                 "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
@@ -61,10 +84,29 @@ export function Sidebar() {
                                     : "text-slate-400 hover:bg-slate-800 hover:text-white"
                             )}
                         >
-                            <item.icon size={20} className="shrink-0" />
-                            <span className="font-medium truncate">{item.label}</span>
+                            <BookOpen size={20} className="shrink-0" />
+                            <span className="font-medium truncate">{section.label}</span>
                         </NavLink>
                     ))}
+
+                    {/* Admin Dashboard link */}
+                    {isAdmin && (
+                        <div className="mt-3 pt-3 border-t border-slate-800">
+                            <NavLink
+                                to="/admin"
+                                onClick={() => setIsOpen(false)}
+                                className={({ isActive }) => cn(
+                                    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
+                                    isActive
+                                        ? "bg-purple-600 text-white shadow-lg shadow-purple-900/20"
+                                        : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                                )}
+                            >
+                                <LayoutDashboard size={20} className="shrink-0" />
+                                <span className="font-medium truncate">Адмін-панель</span>
+                            </NavLink>
+                        </div>
+                    )}
                 </nav>
 
                 <div className="p-4 border-t border-slate-800 bg-slate-900 shrink-0">
@@ -93,8 +135,8 @@ export function Sidebar() {
                     </button>
 
                     <div className="bg-slate-800/50 rounded-lg p-3">
-                        <p className="text-xs text-slate-400">Версія 1.0.0</p>
-                        <p className="text-[10px] text-slate-500 mt-1">Розроблено для професіоналів</p>
+                        <p className="text-xs text-slate-400">Версія 1.1.0</p>
+                        <p className="text-[10px] text-slate-500 mt-1">Розроблено для профес іоналів</p>
                     </div>
                 </div>
             </aside>

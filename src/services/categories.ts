@@ -14,6 +14,7 @@ import { db } from '../lib/firebase';
 
 export type Category = {
     id: string;
+    sectionId?: string;
     label: string;
     color: string;
     order: number;
