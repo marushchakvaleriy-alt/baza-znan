@@ -3,10 +3,11 @@ import { SectionManager } from '../components/SectionManager';
 import { CategoryManager } from '../components/CategoryManager';
 import { SubcategoryManager } from '../components/SubcategoryManager';
 import { AllArticlesManager } from '../components/AllArticlesManager';
-import { LayoutDashboard, FolderTree, FileText } from 'lucide-react';
+import { SearchLogsManager } from '../components/SearchLogsManager';
+import { LayoutDashboard, FolderTree, FileText, BarChart3 } from 'lucide-react';
 
 export function AdminDashboard() {
-    const [activeTab, setActiveTab] = useState<'sections' | 'categories' | 'subcategories' | 'articles'>('sections');
+    const [activeTab, setActiveTab] = useState<'sections' | 'categories' | 'subcategories' | 'articles' | 'search_logs'>('sections');
 
     return (
         <div className="space-y-8">
@@ -59,6 +60,17 @@ export function AdminDashboard() {
                         <FileText size={18} />
                         4. Усі статті
                     </button>
+                    <button
+                        onClick={() => setActiveTab('search_logs')}
+                        className={`flex items-center gap-2 pb-3 px-2 border-b-2 font-medium transition-colors whitespace-nowrap ${
+                            activeTab === 'search_logs' 
+                                ? 'border-purple-600 text-purple-600' 
+                                : 'border-transparent text-slate-500 hover:text-slate-800'
+                        }`}
+                    >
+                        <BarChart3 size={18} />
+                        5. Запити пошуку
+                    </button>
                 </div>
             </div>
 
@@ -67,6 +79,7 @@ export function AdminDashboard() {
                 {activeTab === 'categories' && <CategoryManager />}
                 {activeTab === 'subcategories' && <SubcategoryManager />}
                 {activeTab === 'articles' && <AllArticlesManager />}
+                {activeTab === 'search_logs' && <SearchLogsManager />}
             </div>
         </div>
     );

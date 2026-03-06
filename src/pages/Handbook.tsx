@@ -9,6 +9,7 @@ import { articleService } from '../services/articles';
 import { categoryService, type Category } from '../services/categories';
 import { sectionService, type Section } from '../services/sections';
 import { subcategoryService, type Subcategory } from '../services/subcategories';
+import { searchLogService } from '../services/searchLogs';
 
 export function Handbook() {
     const { sectionId } = useParams<{ sectionId: string }>();
@@ -97,6 +98,18 @@ export function Handbook() {
         
         return matchesCategory && matchesSubcategory && matchesSearch;
     });
+
+    // Logging failed searches
+    useEffect(() => {
+        if (!search.trim() || loading || filtered.length > 0) return;
+
+        const timer = setTimeout(() => {
+            searchLogService.log(search);
+        }, 1500); // 1.5s debounce
+
+        return () => clearTimeout(timer);
+    }, [search, filtered.length, loading]);
+
 
     // Only show categories that belong to this section
     const sectionCategories = categories.filter(c => !sectionId || c.sectionId === sectionId);
