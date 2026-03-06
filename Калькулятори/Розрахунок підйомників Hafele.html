@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hafele Lifter Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: rgba(22, 33, 52, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #e6edf3;
+      --muted: #7d8590;
+      --accent: #2f81f7;
+      --accent2: #7c3aed;
+      --success: #3fb950;
+      --warn: #d29922;
+      --error: #f85149;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 2rem 1rem;
+    }
+
+    .bg-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      background: radial-gradient(ellipse at 20% 40%, rgba(47, 129, 247, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 10%, rgba(124, 58, 237, 0.12) 0%, transparent 60%);
+      animation: glow 12s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      to {
+        opacity: 0.7;
+      }
+    }
+
+    .card {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem 2rem 2.5rem;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      animation: fadeUp .5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 1.8rem;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-bottom: .35rem;
+    }
+
+    .viyar-logo {
+      font-size: 1.7rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 0.5rem;
+      position: relative;
+      top: -1px;
+    }
+
+    .viyar-logo span {
+      background: #fff;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border);
+      margin-bottom: 1.8rem;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: 'Inter', sans-serif;
+      font-size: .78rem;
+      font-weight: 600;
+      padding: .5rem .35rem;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all .25s;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(47, 129, 247, .35);
+    }
+
+    /* Form */
+    .fields {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+    }
+
+    .field label {
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .field input,
+    .field select {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .75rem 1rem;
+      color: var(--text);
+      font-size: .97rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      width: 100%;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(47, 129, 247, .18);
+    }
+
+    .hint {
+      font-size: .72rem;
+      color: var(--muted);
+    }
+
+    .row {
+      display: flex;
+      gap: .75rem;
+    }
+
+    .row .field {
+      flex: 1;
+    }
+
+    /* select arrow */
+    .sel-wrap {
+      position: relative;
+    }
+
+    .sel-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--muted);
+      font-size: .85rem;
+    }
+
+    .sel-wrap select {
+      appearance: none;
+      cursor: pointer;
+    }
+
+    /* custom density */
+    #custom-group {
+      display: none;
+      animation: fadeUp .3s ease;
+    }
+
+    /* Free Flap 1.5 extra */
+    #ff15-extras {
+      animation: fadeUp .3s ease;
+    }
+
+    /* Calc button */
+    .calc-btn {
+      margin-top: .6rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 11px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: .9rem;
+      width: 100%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+      box-shadow: 0 4px 18px rgba(47, 129, 247, .3);
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .calc-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(47, 129, 247, .45);
+    }
+
+    .calc-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* Results */
+    .results {
+      margin-top: 1.8rem;
+      padding-top: 1.8rem;
+      border-top: 1px solid var(--border);
+      display: none;
+      animation: fadeUp .4s ease;
+    }
+
+    .results h2 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 1.2rem;
+    }
+
+    .res-card {
+      background: rgba(0, 0, 0, .25);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: .75rem;
+    }
+
+    .res-card.ok {
+      border-color: rgba(63, 185, 80, .25);
+      background: rgba(63, 185, 80, .07);
+    }
+
+    .res-card.bad {
+      border-color: rgba(248, 81, 73, .25);
+      background: rgba(248, 81, 73, .07);
+    }
+
+    .res-lbl {
+      font-size: .85rem;
+      color: var(--muted);
+    }
+
+    .res-val {
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .res-val small {
+      font-size: .8rem;
+      font-weight: 400;
+      color: var(--muted);
+    }
+
+    .badge {
+      padding: .35rem .9rem;
+      border-radius: 7px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, .3);
+    }
+
+    .msg {
+      margin-top: .75rem;
+      padding: .9rem 1rem;
+      border-radius: 11px;
+      font-size: .87rem;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .msg.warn {
+      background: rgba(210, 153, 34, .12);
+      color: #e3b341;
+      border: 1px solid rgba(210, 153, 34, .25);
+    }
+
+    .msg.success {
+      background: rgba(63, 185, 80, .1);
+      color: #56d364;
+      border: 1px solid rgba(63, 185, 80, .2);
+    }
+
+    .msg.alt {
+      background: rgba(47, 129, 247, .1);
+      color: #79c0ff;
+      border: 1px solid rgba(47, 129, 247, .2);
+      margin-top: .5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-glow"></div>
+  <div class="card">
+    <header>
+      <div class="logo">
+        <div class="viyar-logo"><span>viyar</span></div>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+          <path d="M12 3L3 9v12h6v-6h6v6h6V9L12 3z" stroke="url(#g)" stroke-width="1.8" stroke-linejoin="round" />
+          <defs>
+            <linearGradient id="g" x1="3" y1="3" x2="21" y2="21" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#60a5fa" />
+              <stop offset="1" stop-color="#a78bfa" />
+            </linearGradient>
+          </defs>
+        </svg>
+        Hafele Lifter
+      </div>
+      <p>Калькулятор підбору моделі підіймача</p>
+    </header>
+
+    <!-- Tabs -->
+    <div class="tabs" id="tabs">
+      <button class="tab-btn active" data-lift="ff315">Free Flap</button>
+      <button class="tab-btn" data-lift="fs111">Free Space</button>
+    </div>
+
+    <form id="form" class="fields">
+      <!-- Common inputs -->
+      <div class="field">
+        <label for="height">Висота фасаду (мм)</label>
+        <input type="number" id="height" placeholder="Наприклад: 400" required min="1" step="1">
+        <span class="hint" id="height-hint"></span>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="width">Ширина (мм)</label>
+          <input type="number" id="width" placeholder="600" required min="1" step="1">
+        </div>
+        <div class="field">
+          <label for="thickness">Товщина (мм)</label>
+          <input type="number" id="thickness" placeholder="18" required min="1" step="0.1" value="18">
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="handle">Вага ручки (кг)</label>
+          <input type="number" id="handle" placeholder="0.2" min="0" step="0.01" value="0.2">
+        </div>
+        <div class="field">
+          <label for="material">Матеріал</label>
+          <div class="sel-wrap">
+            <select id="material">
+              <option value="700">ДСП (~700 кг/м³)</option>
+              <option value="750">МДФ (~750 кг/м³)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Free Flap sub-type extras -->
+      <div id="ff-extras">
+        <div class="field">
+          <label for="ff-type">Тип / серія</label>
+          <div class="sel-wrap">
+            <select id="ff-type">
+              <option value="ff17">Free Flap 1.7 — малий/середній (200–450 мм)</option>
+              <option value="ff315">Free Flap 3.15 — великий (350–650 мм)</option>
+              <optgroup label="── з ручкою ──">
+                <option value="ffh15_90">Free Flap H 1.5 — 90° (з ручкою)</option>
+                <option value="ffh15_75">Free Flap H 1.5 — 75° (з ручкою)</option>
+                <option value="ffh15_110">Free Flap H 1.5 — 110° (з ручкою)</option>
+              </optgroup>
+              <optgroup label="── Push-to-Open (без ручки) ──">
+                <option value="ffh15p_90">Free Flap H 1.5 — PushOpen 90° (без ручки)</option>
+                <option value="ffh15p_75">Free Flap H 1.5 — PushOpen 75° (без ручки)</option>
+                <option value="ffh15p_110">Free Flap H 1.5 — PushOpen 110° (без ручки)</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="ff-color">Колір ковпачків</label>
+          <div class="sel-wrap">
+            <select id="ff-color">
+              <option value="grey">Сірий</option>
+              <option value="white">Білий</option>
+              <option value="anthr">Антрацит</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Free Space extras -->
+      <div id="fs-extras" style="display:none;">
+        <div class="row">
+          <div class="field">
+            <label for="fs-type">Тип / серія</label>
+            <div class="sel-wrap">
+              <select id="fs-type">
+                <option value="fs111">Free Space 1.11 — з ручкою (стандарт)</option>
+                <option value="fs615">Free Space 6.15 — з ручкою (важкий)</option>
+                <option value="fs18p">Free Space 1.8 Push — без ручки (стандарт)</option>
+                <option value="fs515p">Free Space 5.15 Push — без ручки (важкий)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="fs-color">Колір механізму</label>
+          <div class="sel-wrap">
+            <select id="fs-color">
+              <option value="white">Білий</option>
+              <option value="lgrey">Світло-сірий</option>
+              <option value="anthr">Антрацит</option>
+              <option value="black">Чорний</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="calc-btn">
+        <span>Розрахувати</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M5 12h14M14 7l5 5-5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </button>
+    </form>
+
+    <div class="results" id="results">
+      <h2>Результати розрахунку</h2>
+      <div class="res-card">
+        <span class="res-lbl">Вага фасаду (з ручкою)</span>
+        <span class="res-val" id="r-weight"></span>
+      </div>
+      <div class="res-card" id="r-model-card">
+        <span class="res-lbl">Рекомендована модель</span>
+        <span class="badge" id="r-model"></span>
+      </div>
+      <div class="res-card" id="r-article-card" style="display:none;">
+        <span class="res-lbl">Артикул</span>
+        <span class="res-val" id="r-article" style="font-size:1rem;letter-spacing:.05em;"></span>
+      </div>
+      <div class="msg" id="r-msg"></div>
+      <div id="r-width-warn" class="msg warn"
+        style="display:none; text-align: left; display: flex; align-items: flex-start; gap: 10px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="flex-shrink:0; margin-top:2px;">
+          <path
+            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span id="r-width-warn-text"></span>
+      </div>
+      <div class="msg alt" id="r-alt" style="display:none;"></div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // DATA TABLES
+    // ============================================================
+
+    const DATA = {
+      // ---- FREE FLAP 1.7 — малий/середній, з ручкою ----
+      ff17: {
+        name: 'Free Flap 1.7',
+        heightRange: [200, 450],
+        hint: 'Від 200 до 450 мм',
+        table: {
+          200: { A: [1.7, 4.6], B: [3.6, 7.9], C: [8.6, 14.7] },
+          225: { A: [1.5, 4.1], B: [3.1, 7.1], C: [6.0, 13.1] },
+          250: { A: [1.3, 3.8], B: [2.9, 6.4], C: [5.4, 11.8] },
+          275: { A: [1.2, 3.3], B: [2.5, 5.7], C: [4.8, 10.6] },
+          300: { A: [1.1, 3.1], B: [2.4, 5.1], C: [4.5, 9.6] },
+          325: { A: [1.0, 2.6], B: [2.0, 4.5], C: [4.0, 8.8] },
+          350: { A: [0.9, 2.6], B: [2.0, 4.2], C: [3.7, 8.1] },
+          375: { A: [0.9, 2.3], B: [1.9, 3.8], C: [3.5, 7.5] },
+          400: { A: [0.8, 2.1], B: [1.7, 3.6], C: [3.2, 7.0] },
+          425: { A: [0.7, 1.9], B: [1.5, 3.4], C: [2.9, 6.5] },
+          450: { A: [0.6, 1.7], B: [1.4, 3.2], C: [2.7, 6.1] },
+        },
+        modelOrder: ['A', 'B', 'C'],
+        modelColors: { A: '#16a34a', B: '#7c3aed', C: '#db2777' },
+        articles: {
+          A: { grey: '372.91.320', white: '372.91.720', anthr: '372.91.370' },
+          B: { grey: '372.91.321', white: '372.91.721', anthr: '372.91.371' },
+          C: { grey: '372.91.322', white: '372.91.722', anthr: '372.91.372' },
+        }
+      },
+      // ---- FREE FLAP 3.15 — великий, з ручкою ----
+      ff315: {
+        name: 'Free Flap 3.15',
+        heightRange: [350, 650],
+        hint: 'Від 350 до 650 мм',
+        table: {
+          350: { D: [5.2, 11.0], E: [5.7, 14.3], F: [10.1, 21.4], G: [13.5, 27.3] },
+          375: { D: [4.9, 10.2], E: [6.3, 13.1], F: [9.4, 19.8], G: [12.5, 25.2] },
+          400: { D: [4.7, 9.6], E: [5.9, 12.4], F: [8.9, 18.6], G: [11.8, 23.3] },
+          425: { D: [4.4, 9.0], E: [5.6, 11.6], F: [8.3, 17.5], G: [11.1, 21.8] },
+          450: { D: [4.1, 8.4], E: [5.2, 10.9], F: [7.8, 16.3], G: [10.4, 20.5] },
+          475: { D: [3.9, 7.9], E: [4.9, 10.3], F: [7.4, 15.5], G: [9.8, 19.4] },
+          500: { D: [3.7, 7.5], E: [4.7, 9.7], F: [7.0, 14.6], G: [9.2, 18.3] },
+          525: { D: [3.5, 7.1], E: [4.4, 9.1], F: [6.6, 13.9], G: [8.7, 17.4] },
+          550: { D: [3.3, 6.8], E: [4.2, 8.8], F: [6.3, 13.2], G: [8.3, 16.5] },
+          575: { D: [3.1, 6.5], E: [4.0, 8.3], F: [6.0, 12.6], G: [7.9, 15.8] },
+          600: { D: [3.0, 6.2], E: [3.8, 8.0], F: [5.7, 12.0], G: [7.6, 15.0] },
+          625: { D: [2.8, 5.9], E: [3.6, 7.6], F: [5.5, 11.5], G: [7.2, 14.5] },
+          650: { D: [2.6, 5.6], E: [3.4, 7.3], F: [5.3, 11.0], G: [6.9, 14.0] }
+        },
+        modelOrder: ['D', 'E', 'F', 'G'],
+        modelColors: { D: '#7c3aed', E: '#db2777', F: '#b45309', G: '#16a34a' },
+        articles: {
+          D: { grey: '372.91.330', white: '372.91.730', anthr: '372.91.380' },
+          E: { grey: '372.91.331', white: '372.91.731', anthr: '372.91.381' },
+          F: { grey: '372.91.332', white: '372.91.732', anthr: '372.91.382' },
+          G: { grey: '372.91.333', white: '372.91.733', anthr: '372.91.383' },
+        }
+      },
+
+      // ---- FREE FLAP H 1.5 — 90°, з ручкою ----
+      ffh15_90: {
+        name: 'Free Flap H 1.5 (90°)',
+        heightRange: [275, 600],
+        hint: 'Від 275 до 600 мм (кут відкривання 90°, з ручкою)',
+        table: {
+          275: { A: [2.8, 3.8], B: [3.5, 6.0], D: [5.8, 10.5] },
+          300: { A: [2.2, 3.4], B: [3.3, 5.7], D: [5.2, 9.0] },
+          350: { A: [1.8, 2.8], B: [2.5, 5.0], D: [4.2, 8.0] },
+          400: { A: [1.6, 2.3], B: [2.3, 4.6], D: [4.3, 7.9] },
+          450: { A: [1.3, 2.2], B: [2.0, 3.8], D: [3.2, 6.5] },
+          500: { A: [1.2, 2.0], B: [1.7, 3.4], D: [3.2, 6.5] },
+          550: { A: [1.2, 1.9], B: [1.7, 3.0], D: [3.6, 5.1] },
+          600: { A: [0.9, 1.6], B: [1.8, 3.0], D: [3.0, 4.7] },
+        },
+        modelOrder: ['A', 'B', 'D'],
+        modelColors: { A: '#16a34a', B: '#7c3aed', D: '#0891b2' },
+        articles: {
+          A: { grey: '372.28.500', white: '372.28.700' },
+          B: { grey: '372.28.510', white: '372.28.710' },
+          D: { grey: '372.28.530', white: '372.28.730' },
+        }
+      },
+      // ---- FREE FLAP H 1.5 — 75°, з ручкою ----
+      ffh15_75: {
+        name: 'Free Flap H 1.5 (75°)',
+        heightRange: [350, 600],
+        hint: 'Від 350 до 600 мм (кут відкривання 75°, з ручкою)',
+        table: {
+          350: { A: [2.0, 4.2], B: [3.8, 6.5], D: [6.2, 10.9] },
+          400: { A: [2.3, 3.3], B: [3.0, 5.8], D: [5.6, 10.2] },
+          450: { A: [2.2, 3.1], B: [2.7, 4.6], D: [5.3, 9.7] },
+          500: { A: [1.9, 3.0], B: [2.5, 4.8], D: [4.2, 7.5] },
+          550: { A: [1.6, 2.6], B: [2.2, 4.2], D: [4.1, 6.8] },
+          600: { A: [1.2, 2.3], B: [2.1, 3.9], D: [3.5, 6.0] },
+        },
+        modelOrder: ['A', 'B', 'D'],
+        modelColors: { A: '#16a34a', B: '#7c3aed', D: '#0891b2' },
+        articles: {
+          A: { grey: '372.28.500', white: '372.28.700' },
+          B: { grey: '372.28.510', white: '372.28.710' },
+          D: { grey: '372.28.530', white: '372.28.730' },
+        }
+      },
+      // ---- FREE FLAP H 1.5 — 110°, з ручкою ----
+      ffh15_110: {
+        name: 'Free Flap H 1.5 (110°)',
+        heightRange: [300, 600],
+        hint: 'Від 300 до 600 мм (кут відкривання 110°, з ручкою)',
+        table: {
+          300: { A: [1.1, 2.6], B: [2.4, 4.1], D: [4.0, 7.0] },
+          350: { A: [1.1, 2.1], B: [1.7, 3.4], D: [3.6, 5.4] },
+          400: { A: [1.0, 1.8], B: [1.6, 2.8], D: [2.7, 4.6] },
+          450: { A: [1.0, 1.8], B: [1.6, 2.5], D: [2.7, 4.5] },
+          500: { A: [1.0, 1.4], B: [1.3, 2.5], D: [2.6, 4.5] },
+          550: { A: [0.8, 1.3], B: [1.3, 2.2], D: [2.2, 3.9] },
+          600: { A: [0.7, 1.2], B: [1.2, 2.2], D: [2.2, 4.3] },
+        },
+        modelOrder: ['A', 'B', 'D'],
+        modelColors: { A: '#16a34a', B: '#7c3aed', D: '#0891b2' },
+        articles: {
+          A: { grey: '372.28.500', white: '372.28.700' },
+          B: { grey: '372.28.510', white: '372.28.710' },
+          D: { grey: '372.28.530', white: '372.28.730' },
+        }
+      },
+
+      // ── FREE FLAP H 1.5 PUSH-TO-OPEN ──
+      ffh15p_90: {
+        name: 'Free Flap H 1.5 PushOpen (90°)', heightRange: [350, 600],
+        hint: 'Від 350 до 600 мм (Push-to-Open, 90°, без ручки)',
+        table: {
+          350: { B: [1.7, 2.5], C: [2.1, 3.2], D: [3.6, 4.0] },
+          400: { B: [1.3, 1.9], C: [1.9, 3.7], D: [2.6, 4.0] },
+          450: { B: [1.1, 1.5], C: [1.5, 2.6], D: [2.6, 3.2] },
+          500: { C: [1.3, 2.2], D: [2.0, 3.2] },
+          550: { C: [1.3, 2.7], D: [1.8, 2.8] },
+          600: { C: [1.2, 2.8], D: [1.7, 2.5] },
+        },
+        modelOrder: ['B', 'C', 'D'], modelColors: { B: '#7c3aed', C: '#db2777', D: '#0891b2' },
+        articles: { B: { grey: '372.28.510', white: '372.28.710' }, C: { grey: '372.28.520', white: '372.28.720' }, D: { grey: '372.28.530', white: '372.28.730' } }
+      },
+      ffh15p_75: {
+        name: 'Free Flap H 1.5 PushOpen (75°)', heightRange: [350, 600],
+        hint: 'Від 350 до 600 мм (Push-to-Open, 75°, без ручки)',
+        table: {
+          350: { B: [2.6, 3.6], C: [3.1, 5.3], D: [4.7, 8.8] },
+          400: { B: [2.3, 3.1], C: [3.1, 5.1], D: [3.6, 8.0] },
+          450: { B: [2.1, 3.0], C: [2.5, 4.2], D: [3.1, 4.8] },
+          500: { B: [1.8, 2.9], C: [2.0, 3.2] },
+          550: { B: [1.6, 2.3], C: [2.0, 3.2] },
+          600: { B: [1.4, 2.2], C: [2.0, 3.2] },
+        },
+        modelOrder: ['B', 'C', 'D'], modelColors: { B: '#7c3aed', C: '#db2777', D: '#0891b2' },
+        articles: { B: { grey: '372.28.510', white: '372.28.710' }, C: { grey: '372.28.520', white: '372.28.720' }, D: { grey: '372.28.530', white: '372.28.730' } }
+      },
+      ffh15p_110: {
+        name: 'Free Flap H 1.5 PushOpen (110°)', heightRange: [350, 600],
+        hint: 'Від 350 до 600 мм (Push-to-Open, 110°, без ручки)',
+        table: {
+          350: { B: [1.5, 2.1], C: [2.1, 3.6], D: [2.7, 4.1] },
+          400: { B: [1.1, 1.5], C: [1.5, 2.2], D: [2.3, 3.5] },
+          450: { B: [1.0, 1.3], C: [1.5, 2.3], D: [2.3, 3.2] },
+          500: { B: [1.0, 1.1], C: [1.2, 1.7], D: [1.6, 2.7] },
+          550: { B: [0.7, 1.2], C: [1.2, 1.7], D: [1.5, 2.5] },
+          600: { D: [1.2, 1.7] },
+        },
+        modelOrder: ['B', 'C', 'D'], modelColors: { B: '#7c3aed', C: '#db2777', D: '#0891b2' },
+        articles: { B: { grey: '372.28.510', white: '372.28.710' }, C: { grey: '372.28.520', white: '372.28.720' }, D: { grey: '372.28.530', white: '372.28.730' } }
+      },
+
+      // ---- FREE FLAP 1.5 ---- 1 and 2 mechanisms
+      ff15: {
+        name: 'Free Flap 1.5',
+        heightRange: [275, 550],
+        hint: 'Від 275 до 550 мм',
+        // table[mech][height][model] = [min, max]
+        table: {
+          1: {
+            275: { A: [2.8, 3.8], B: [1.7, 3.0], C: [1.9, 2.8], D: [0.9, 1.6] },
+            300: { A: [2.2, 3.4], B: [2.0, 3.8], C: [1.1, 2.4], D: [1.1, 2.1] },
+            350: { A: [3.5, 6.0], B: [3.0, 5.1], C: [1.1, 2.1], D: [1.1, 1.7] },
+            400: { A: [3.3, 5.7], B: [1.6, 3.0], C: [1.0, 1.6], D: [1.0, 1.4] },
+            450: { A: [2.7, 4.9], B: [1.3, 2.2] },
+            500: { A: [2.3, 4.6], B: [1.2, 2.0] },
+            550: { A: [1.7, 3.4], B: [1.2, 1.9] },
+          },
+          2: {
+            275: { A: [5.2, 9.0], B: [3.9, 6.0], C: [4.0, 7.0], D: [2.6, 4.2] },
+            300: { A: [4.8, 8.0], B: [3.8, 6.5], C: [3.6, 6.4], D: [2.3, 3.3] },
+            350: { A: [4.3, 7.9], B: [4.1, 6.6], C: [3.2, 5.5], D: [2.2, 3.1] },
+            400: { A: [3.8, 6.3], B: [4.6, 8.5], C: [2.8, 5.5], D: [1.7, 2.8] },
+            450: { A: [3.4, 6.0], B: [5.5, 9.7], C: [2.5, 4.5], D: [1.6, 2.6] },
+            500: { D: [1.2, 2.3] },
+          }
+        },
+        modelOrder: ['D', 'C', 'B', 'A'], // weakest to strongest for display
+        modelColors: { A: '#16a34a', B: '#0891b2', C: '#7c3aed', D: '#db2777' },
+      },
+
+      // ---- FREE SPACE 1.11 — з ручкою, стандартний ----
+      fs111: {
+        name: 'Free Space 1.11',
+        heightRange: [225, 650],
+        hint: 'Від 225 до 650 мм (з ручкою, стандарт)',
+        table: {
+          225: { B: [2.3, 4.3], C: [3.8, 7.1], D: [6.4, 9.3], E: [9.2, 13.4], F: [13.4, 19.1] },
+          250: { B: [1.9, 3.9], C: [3.4, 6.4], D: [5.8, 9.1], E: [8.3, 12.6], F: [12.1, 17.2] },
+          275: { B: [1.9, 3.5], C: [3.1, 5.8], D: [5.3, 8.2], E: [7.5, 12.0], F: [11.0, 15.6] },
+          300: { B: [1.7, 3.2], C: [2.8, 5.3], D: [4.8, 7.5], E: [6.9, 11.0], F: [10.1, 14.3] },
+          325: { B: [1.6, 3.0], C: [2.6, 4.9], D: [4.4, 7.0], E: [6.4, 10.2], F: [9.3, 13.2] },
+          350: { B: [1.5, 2.8], C: [2.4, 4.6], D: [4.1, 6.5], E: [5.9, 9.5], F: [8.6, 12.3] },
+          375: { B: [1.3, 2.6], C: [2.2, 4.3], D: [3.8, 6.0], E: [5.5, 8.8], F: [8.1, 11.4] },
+          400: { B: [1.2, 2.4], C: [2.1, 4.0], D: [3.6, 5.6], E: [5.2, 8.3], F: [7.6, 10.7] },
+          425: { B: [1.1, 2.3], C: [2.0, 3.8], D: [3.4, 5.3], E: [4.9, 7.8], F: [7.1, 10.1] },
+          450: { B: [1.0, 2.1], C: [1.9, 3.5], D: [3.2, 5.0], E: [4.6, 7.3], F: [6.7, 9.5] },
+          475: { B: [1.0, 2.0], C: [1.8, 3.4], D: [3.0, 4.7], E: [4.3, 7.0], F: [6.4, 9.0] },
+          500: { B: [0.9, 1.9], C: [1.7, 3.2], D: [2.9, 4.5], E: [4.1, 6.6], F: [6.0, 8.6] },
+          525: { B: [0.9, 1.8], C: [1.6, 3.0], D: [2.7, 4.3], E: [3.9, 6.3], F: [5.7, 8.2] },
+          550: { B: [0.8, 1.7], C: [1.5, 2.9], D: [2.6, 4.1], E: [3.7, 6.0], F: [5.5, 7.8] },
+          575: { B: [0.8, 1.7], C: [1.4, 2.8], D: [2.5, 3.9], E: [3.6, 5.7], F: [5.2, 7.4] },
+          600: { B: [0.8, 1.6], C: [1.4, 2.7], D: [2.4, 3.7], E: [3.4, 5.5], F: [5.0, 7.1] },
+          625: { B: [0.7, 1.5], C: [1.3, 2.5], D: [2.3, 3.6], E: [3.3, 5.3], F: [4.8, 6.8] },
+          650: { B: [0.7, 1.5], C: [1.3, 2.4], D: [2.2, 3.5], E: [3.2, 5.1], F: [4.6, 6.6] },
+        },
+        modelOrder: ['B', 'C', 'D', 'E', 'F'],
+        modelColors: { B: '#0891b2', C: '#7c3aed', D: '#16a34a', E: '#b45309', F: '#db2777' },
+        articles: {
+          B: { white: '372.27.700', lgrey: '372.27.500', anthr: '372.27.350', black: '372.27.300' },
+          C: { white: '372.27.701', lgrey: '372.27.501', anthr: '372.27.351', black: '372.27.301' },
+          D: { white: '372.27.702', lgrey: '372.27.502', anthr: '372.27.352', black: '372.27.302' },
+          E: { white: '372.27.703', lgrey: '372.27.503', anthr: '372.27.353', black: '372.27.303' },
+          F: { white: '372.27.704', lgrey: '372.27.504', anthr: '372.27.354', black: '372.27.304' },
+        }
+      },
+      // ---- FREE SPACE 6.15 — з ручкою, важкий ----
+      fs615: {
+        name: 'Free Space 6.15',
+        heightRange: [350, 650],
+        hint: 'Від 350 до 650 мм (з ручкою, важкий)',
+        table: {
+          350: { G: [11.7, 18.9], H: [18.0, 25.7] },
+          375: { G: [10.9, 17.6], H: [16.8, 24.0] },
+          400: { G: [10.2, 16.5], H: [15.8, 22.5] },
+          425: { G: [9.6, 15.5], H: [14.8, 21.2] },
+          450: { G: [9.1, 14.7], H: [14.0, 20.0] },
+          475: { G: [8.6, 13.9], H: [13.3, 18.9] },
+          500: { G: [8.2, 13.2], H: [12.6, 18.0] },
+          525: { G: [7.8, 12.6], H: [12.0, 17.1] },
+          550: { G: [7.4, 12.0], H: [11.5, 16.4] },
+          575: { G: [7.1, 11.5], H: [11.0, 15.7] },
+          600: { G: [6.8, 11.0], H: [10.5, 15.0] },
+          625: { G: [6.5, 10.6], H: [10.1, 14.4] },
+          650: { G: [6.3, 10.2], H: [9.7, 13.8] },
+        },
+        modelOrder: ['G', 'H'],
+        modelColors: { G: '#16a34a', H: '#0891b2' },
+        articles: {
+          G: { white: '372.27.721', lgrey: '372.27.521', anthr: '372.27.321', black: '372.27.421' },
+          H: { white: '372.27.722', lgrey: '372.27.522', anthr: '372.27.322', black: '372.27.422' },
+        }
+      },
+      // ---- FREE SPACE 1.8 PUSH — без ручки, стандартний ----
+      fs18p: {
+        name: 'Free Space 1.8 Push',
+        heightRange: [225, 650],
+        hint: 'Від 225 до 650 мм (Push-to-Open, без ручки, стандарт)',
+        table: {
+          225: { B: [2.3, 4.3], C: [3.8, 7.1], D: [6.4, 9.3], E: [9.2, 13.4] },
+          250: { B: [1.9, 3.9], C: [3.4, 6.4], D: [5.8, 9.1], E: [8.3, 12.6] },
+          275: { B: [1.9, 3.5], C: [3.1, 5.8], D: [5.3, 8.2], E: [7.5, 12.0] },
+          300: { B: [1.7, 3.2], C: [2.8, 5.3], D: [4.8, 7.5], E: [6.9, 11.0] },
+          325: { B: [1.6, 3.0], C: [2.6, 4.9], D: [4.4, 7.0], E: [6.4, 10.2] },
+          350: { B: [1.5, 2.8], C: [2.4, 4.6], D: [4.1, 6.5], E: [5.9, 9.5] },
+          375: { B: [1.3, 2.6], C: [2.2, 4.3], D: [3.8, 6.0], E: [5.5, 8.8] },
+          400: { B: [1.2, 2.4], C: [2.1, 4.0], D: [3.6, 5.6], E: [5.2, 8.3] },
+          425: { B: [1.1, 2.3], C: [2.0, 3.8], D: [3.4, 5.3], E: [4.9, 7.8] },
+          450: { B: [1.0, 2.1], C: [1.9, 3.5], D: [3.2, 5.0], E: [4.6, 7.3] },
+          475: { B: [1.0, 2.0], C: [1.8, 3.4], D: [3.0, 4.7], E: [4.3, 7.0] },
+          500: { B: [0.9, 1.9], C: [1.7, 3.2], D: [2.9, 4.5], E: [4.1, 6.6] },
+          525: { B: [0.9, 1.8], C: [1.6, 3.0], D: [2.7, 4.3], E: [3.9, 6.3] },
+          550: { B: [0.8, 1.7], C: [1.5, 2.9], D: [2.6, 4.1], E: [3.7, 6.0] },
+          575: { B: [0.8, 1.7], C: [1.4, 2.8], D: [2.5, 3.9], E: [3.6, 5.7] },
+          600: { B: [0.8, 1.6], C: [1.4, 2.7], D: [2.4, 3.7], E: [3.4, 5.5] },
+          625: { B: [0.7, 1.5], C: [1.3, 2.5], D: [2.3, 3.6], E: [3.3, 5.3] },
+          650: { B: [0.7, 1.5], C: [1.3, 2.4], D: [2.2, 3.5], E: [3.2, 5.1] },
+        },
+        modelOrder: ['B', 'C', 'D', 'E'],
+        modelColors: { B: '#0891b2', C: '#7c3aed', D: '#16a34a', E: '#b45309' },
+        articles: {
+          B: { white: '372.27.705', lgrey: '372.27.505', anthr: '372.27.355', black: '372.27.305' },
+          C: { white: '372.27.706', lgrey: '372.27.506', anthr: '372.27.356', black: '372.27.306' },
+          D: { white: '372.27.707', lgrey: '372.27.507', anthr: '372.27.357', black: '372.27.307' },
+          E: { white: '372.27.708', lgrey: '372.27.508', anthr: '372.27.358', black: '372.27.308' },
+        }
+      },
+      // ---- FREE SPACE 5.15 PUSH — без ручки, важкий ----
+      fs515p: {
+        name: 'Free Space 5.15 Push',
+        heightRange: [350, 650],
+        hint: 'Від 350 до 650 мм (Push-to-Open, без ручки, важкий)',
+        table: {
+          350: { F: [8.7, 12.3], G: [11.7, 18.9], H: [18.0, 25.7] },
+          375: { F: [8.1, 11.5], G: [10.9, 17.6], H: [16.8, 24.0] },
+          400: { F: [7.6, 10.8], G: [10.2, 16.5], H: [15.8, 22.5] },
+          425: { F: [7.2, 10.1], G: [9.6, 15.5], H: [14.8, 21.2] },
+          450: { F: [6.8, 9.6], G: [9.1, 14.7], H: [14.0, 20.0] },
+          475: { F: [6.4, 9.1], G: [8.6, 13.9], H: [13.3, 18.9] },
+          500: { F: [6.1, 8.6], G: [8.2, 13.2], H: [12.6, 18.0] },
+          525: { F: [5.8, 8.2], G: [7.8, 12.6], H: [12.0, 17.1] },
+          550: { F: [5.5, 7.8], G: [7.4, 12.0], H: [11.5, 16.4] },
+          575: { F: [5.3, 7.5], G: [7.1, 11.5], H: [11.0, 15.7] },
+          600: { F: [5.1, 7.2], G: [6.8, 11.0], H: [10.5, 15.0] },
+          625: { F: [4.9, 6.9], G: [6.5, 10.6], H: [10.1, 14.4] },
+          650: { F: [4.6, 6.6], G: [6.3, 10.2], H: [9.7, 13.8] },
+        },
+        modelOrder: ['F', 'G', 'H'],
+        modelColors: { F: '#b45309', G: '#16a34a', H: '#0891b2' },
+        articles: {
+          F: { white: '372.27.730', lgrey: '372.27.530', anthr: '372.27.330', black: '372.27.430' },
+          G: { white: '372.27.731', lgrey: '372.27.531', anthr: '372.27.331', black: '372.27.431' },
+          H: { white: '372.27.732', lgrey: '372.27.532', anthr: '372.27.332', black: '372.27.432' },
+        }
+      }
+    };
+
+
+    // ============================================================
+    // INTERPOLATION HELPER
+    // ============================================================
+    function interpolate(table, height, models) {
+      const heights = Object.keys(table).map(Number).sort((a, b) => a - b);
+      const h0 = heights[0], hN = heights[heights.length - 1];
+      const clampedH = Math.max(h0, Math.min(hN, height));
+
+      let lo = h0, hi = hN;
+      for (let i = 0; i < heights.length - 1; i++) {
+        if (clampedH >= heights[i] && clampedH <= heights[i + 1]) { lo = heights[i]; hi = heights[i + 1]; break; }
+      }
+      const t = lo === hi ? 0 : (clampedH - lo) / (hi - lo);
+
+      const result = {};
+      for (const m of models) {
+        const rLo = table[lo]?.[m];
+        const rHi = table[hi]?.[m];
+        if (!rLo) continue;
+        const r = rHi ? [
+          rLo[0] + t * (rHi[0] - rLo[0]),
+          rLo[1] + t * (rHi[1] - rLo[1])
+        ] : rLo;
+        result[m] = r;
+      }
+      return result;
+    }
+
+    function findModel(ranges, weight) {
+      // Return the FIRST (weakest/lightest sufficient) model whose range includes the weight
+      const models = Object.keys(ranges);
+      for (const m of models) {
+        if (weight >= ranges[m][0] && weight <= ranges[m][1]) return m;
+      }
+      return null;
+    }
+
+    // ============================================================
+    // UI LOGIC
+    // ============================================================
+    let currentLift = 'ff315';
+
+    document.getElementById('tabs').addEventListener('click', e => {
+      const btn = e.target.closest('[data-lift]');
+      if (!btn) return;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentLift = btn.dataset.lift;
+      updateHint();
+      document.getElementById('ff-extras').style.display = currentLift === 'ff315' ? '' : 'none';
+      document.getElementById('fs-extras').style.display = currentLift === 'fs111' ? '' : 'none';
+      document.getElementById('results').style.display = 'none';
+    });
+
+
+
+    function updateHint() {
+      let key = currentLift;
+      if (currentLift === 'fs111') key = document.getElementById('fs-type')?.value || 'fs111';
+      if (currentLift === 'ff315') key = document.getElementById('ff-type')?.value || 'ff315';
+      document.getElementById('height-hint').textContent = DATA[key]?.hint || '';
+    }
+    document.getElementById('fs-type')?.addEventListener('change', updateHint);
+    document.getElementById('ff-type')?.addEventListener('change', updateHint);
+    updateHint();
+
+    document.getElementById('form').addEventListener('submit', e => {
+      e.preventDefault();
+      const height = parseFloat(document.getElementById('height').value);
+      const width = parseFloat(document.getElementById('width').value);
+      const thick = parseFloat(document.getElementById('thickness').value);
+      const handle = parseFloat(document.getElementById('handle').value || 0);
+      const density = parseFloat(document.getElementById('material').value);
+      const volume = (height * width * thick) / 1000000000;
+      const totalW = volume * density + handle;
+
+      // Resolve the actual data key
+      let dataKey = currentLift;
+      if (currentLift === 'fs111') dataKey = document.getElementById('fs-type')?.value || 'fs111';
+      if (currentLift === 'ff315') dataKey = document.getElementById('ff-type')?.value || 'ff315';
+      const d = DATA[dataKey];
+      const [hMin, hMax] = d.heightRange;
+      // Color selector: Free Flap uses ff-color (grey/white/anthr), Free Space uses fs-color
+      const selectedColor = (currentLift === 'ff315')
+        ? (document.getElementById('ff-color')?.value || 'grey')
+        : (document.getElementById('fs-color')?.value || 'white');
+
+      // Weight display
+      document.getElementById('r-weight').innerHTML = `${totalW.toFixed(2)} <small>кг</small>`;
+
+      const resultsEl = document.getElementById('results');
+      const modelCard = document.getElementById('r-model-card');
+      const modelBadge = document.getElementById('r-model');
+      const msgEl = document.getElementById('r-msg');
+      const altEl = document.getElementById('r-alt');
+      const articleCard = document.getElementById('r-article-card');
+      const articleEl = document.getElementById('r-article');
+
+      let model = null;
+      let outOfRange = false;
+
+      if (height < hMin || height > hMax) {
+        outOfRange = true;
+      } else if (currentLift === 'ff15') {
+        const mechCount = parseInt(document.getElementById('mechanism-count').value);
+        const mechTable = d.table[mechCount];
+        const ranges = interpolate(mechTable, height, d.modelOrder);
+        model = findModel(ranges, totalW);
+      } else {
+        const ranges = interpolate(d.table, height, d.modelOrder);
+        model = findModel(ranges, totalW);
+      }
+
+      // Render result
+      const allTypeKeys = ['ff17', 'ff315', 'ffh15_90', 'ffh15_75', 'ffh15_110', 'ffh15p_90', 'ffh15p_75', 'ffh15p_110', 'fs111', 'fs615', 'fs18p', 'fs515p'];
+
+      if (model && !outOfRange) {
+        modelCard.className = 'res-card ok';
+        modelBadge.textContent = `Модель ${model}`;
+        modelBadge.style.background = d.modelColors[model];
+        msgEl.className = 'msg success';
+        msgEl.textContent = `✓ Вага ${totalW.toFixed(2)} кг підходить для ${d.name} Модель ${model}.`;
+        altEl.style.display = 'none';
+
+        // Show article if available
+        const art = d.articles?.[model]?.[selectedColor];
+        if (art) {
+          articleCard.style.display = '';
+          articleEl.textContent = art;
+        } else {
+          articleCard.style.display = 'none';
+        }
+      } else {
+        articleCard.style.display = 'none';
+        modelCard.className = 'res-card bad';
+        modelBadge.textContent = outOfRange ? 'Поза діапазоном' : 'Не підходить';
+        modelBadge.style.background = 'var(--error)';
+        msgEl.className = 'msg warn';
+
+        if (outOfRange) {
+          msgEl.textContent = `Висота ${height} мм поза допустимим діапазоном ${hMin}–${hMax} мм для ${d.name}.`;
+        } else if (totalW < 0.5) {
+          msgEl.textContent = 'Вага фасаду занадто мала. Перевірте параметри.';
+        } else {
+          const ranges = interpolate(d.table, height, d.modelOrder);
+          const vals = Object.values(ranges).filter(v => v);
+          if (vals.length === 0) {
+            msgEl.textContent = `Немає даних для висоти ${height} мм у ${d.name}.`;
+          } else {
+            const maxRange = Math.max(...vals.map(v => v[1]));
+            const minRange = Math.min(...vals.map(v => v[0]));
+            if (totalW > maxRange) {
+              msgEl.textContent = `Фасад (${totalW.toFixed(2)} кг) важчий за максимум ${d.name} (${maxRange.toFixed(1)} кг) для висоти ${height} мм.`;
+            } else {
+              msgEl.textContent = `Фасад (${totalW.toFixed(2)} кг) легший за мінімум ${d.name} (${minRange.toFixed(1)} кг) для висоти ${height} мм.`;
+            }
+          }
+        }
+
+        // Search alternatives across ALL types including current selection's range
+        let suggestions = [];
+        for (const type of allTypeKeys) {
+          if (type === dataKey) continue;
+          const td = DATA[type];
+          if (!td) continue;
+          const [mn, mx] = td.heightRange;
+          if (height < mn || height > mx) continue;
+          const r = interpolate(td.table, height, td.modelOrder);
+          const m = findModel(r, totalW);
+          if (m) suggestions.push(`${td.name} Модель ${m}`);
+        }
+
+        if (suggestions.length) {
+          altEl.style.display = '';
+          altEl.innerHTML = '💡 Альтернативи: ' + suggestions.join(' або ');
+        } else {
+          altEl.style.display = 'none';
+        }
+      }
+
+      // Check for wide front sagging risk
+      const widthWarnEl = document.getElementById('r-width-warn');
+      const widthWarnText = document.getElementById('r-width-warn-text');
+      if (width > 1200) {
+        widthWarnEl.style.display = 'flex';
+        widthWarnText.innerHTML = `<strong>УВАГА:</strong> Ширина ${width} мм перевищує рекомендовану. Ризик значного прогину фасаду!`;
+      } else if (width > 900) {
+        widthWarnEl.style.display = 'flex';
+        widthWarnText.innerHTML = `<strong>УВАГА:</strong> Ширина ${width} мм > 900 мм! Ризик прогину.`;
+      } else {
+        widthWarnEl.style.display = 'none';
+      }
+
+      resultsEl.style.display = 'block';
+      resultsEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  </script>
+</body>
+
+</html>

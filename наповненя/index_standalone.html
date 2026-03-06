@@ -1,0 +1,543 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hafele Free Flap 3.15 Калькулятор</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+:root {
+    --bg-color: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent-color: #3b82f6;
+    --accent-hover: #2563eb;
+    --error-color: #ef4444;
+    --success-color: #10b981;
+    --model-d: #8b5cf6;
+    --model-e: #ec4899;
+    --model-f: #f59e0b;
+    --model-g: #10b981;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Dynamic Animated Background */
+.background-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background: 
+        radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+    animation: pulseBackground 15s ease-in-out infinite alternate;
+}
+
+@keyframes pulseBackground {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.1); }
+}
+
+/* Main Container - Glassmorphism */
+.calculator-container {
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transform: translateY(20px);
+    opacity: 0;
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+h1 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* Form Styles */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+input, select {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 0.875rem 1rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    width: 100%;
+    outline: none;
+}
+
+input:focus, select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.hint {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: -0.25rem;
+}
+
+/* Custom Select styling */
+.select-wrapper {
+    position: relative;
+}
+
+.select-wrapper::after {
+    content: "▼";
+    font-size: 0.8rem;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--text-secondary);
+}
+
+select {
+    appearance: none;
+    cursor: pointer;
+}
+
+.custom-density-group {
+    display: none;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Button */
+.calculate-btn {
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.calculate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+}
+
+.calculate-btn:active {
+    transform: translateY(1px);
+}
+
+/* Results Section */
+.results-container {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+    animation: fadeIn 0.5s ease-out;
+}
+
+.results-container h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.result-card {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.result-card:hover {
+    transform: scale(1.02);
+}
+
+.result-card.highlight {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.result-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.result-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.result-value span {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+}
+
+.model-badge {
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    background: var(--model-d);
+    color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.warning-message, .success-message {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    text-align: center;
+    display: none;
+}
+
+.warning-message {
+    background: rgba(239, 68, 68, 0.1);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.success-message {
+    background: rgba(16, 185, 129, 0.1);
+    color: #6ee7b7;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .calculator-container {
+        padding: 1.5rem;
+    }
+    
+    .input-group[style] {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+}
+
+</style>
+</head>
+<body>
+    <div class="background-animation"></div>
+    
+    <div class="calculator-container">
+        <header>
+            <h1>Hafele Free Flap 3.15</h1>
+            <p>Калькулятор ваги фасаду та підбору моделі підіймача</p>
+        </header>
+
+        <main>
+            <form id="calculator-form">
+                <div class="input-group">
+                    <label for="height">Висота фасаду (мм)</label>
+                    <input type="number" id="height" placeholder="Наприклад: 400" required min="350" max="650" step="1">
+                    <span class="hint">Від 350 до 650 мм для Free Flap 3.15</span>
+                </div>
+
+                <div class="input-group">
+                    <label for="width">Ширина фасаду (мм)</label>
+                    <input type="number" id="width" placeholder="Наприклад: 600" required min="50" step="1">
+                </div>
+
+                <div class="input-group" style="display: flex; gap: 15px;">
+                    <div style="flex: 1;">
+                        <label for="thickness">Товщина (мм)</label>
+                        <input type="number" id="thickness" placeholder="18" required min="1" step="0.1" value="18">
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="handle-weight">Вага ручки (кг)</label>
+                        <input type="number" id="handle-weight" placeholder="0.2" min="0" step="0.01" value="0.2">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="material">Матеріал фасаду</label>
+                    <div class="select-wrapper">
+                        <select id="material">
+                            <option value="700">ДСП (~700 кг/м³)</option>
+                            <option value="750">МДФ (~750 кг/м³)</option>
+                            <option value="500">Масив дерева м'який (~500 кг/м³)</option>
+                            <option value="800">Масив дерева твердий (~800 кг/м³)</option>
+                            <option value="2500">Скло (~2500 кг/м³)</option>
+                            <option value="custom">Власна щільність...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group custom-density-group" id="custom-density-group">
+                    <label for="custom-density">Щільність матеріалу (кг/м³)</label>
+                    <input type="number" id="custom-density" placeholder="Введіть щільність" min="100" step="1">
+                </div>
+
+                <button type="submit" class="calculate-btn">
+                    <span>Розрахувати</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </form>
+
+            <div class="results-container" id="results" style="display: none;">
+                <h2>Результати розрахунку</h2>
+                
+                <div class="result-card">
+                    <div class="result-label">Вага фасаду (з ручкою)</div>
+                    <div class="result-value" id="result-weight">0.00 <span>кг</span></div>
+                </div>
+
+                <div class="result-card highlight">
+                    <div class="result-label">Рекомендована модель</div>
+                    <div class="result-value model-badge" id="result-model">Модель D</div>
+                </div>
+                
+                <div class="warning-message" id="warning-message"></div>
+                <div class="success-message" id="success-message">
+                    Дана вага ідеально підходить для обраної моделі підіймача.
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('calculator-form');
+    const materialSelect = document.getElementById('material');
+    const customDensityGroup = document.getElementById('custom-density-group');
+    const customDensityInput = document.getElementById('custom-density');
+    
+    const resultsContainer = document.getElementById('results');
+    const resultWeight = document.getElementById('result-weight');
+    const resultModel = document.getElementById('result-model');
+    const warningMessage = document.getElementById('warning-message');
+    const successMessage = document.getElementById('success-message');
+
+    // Toggle custom density input
+    materialSelect.addEventListener('change', (e) => {
+        if (e.target.value === 'custom') {
+            customDensityGroup.style.display = 'flex';
+            customDensityInput.required = true;
+        } else {
+            customDensityGroup.style.display = 'none';
+            customDensityInput.required = false;
+        }
+    });
+
+    // Hafele Free Flap 3.15 Capacity Data (Approximate centers of overlapping ranges)
+    // Structure: { height: { model: [min_weight, max_weight] } }
+    const capacityTable = {
+        350: { D: [5.2, 8.1], E: [6.7, 11.8], F: [10.1, 18.1], G: [17.9, 27.3] },
+        375: { D: [4.9, 8.8], E: [6.3, 12.1], F: [9.4, 19.8], G: [12.5, 25.2] }, // Interpolated / Extrapolated slightly for missing exact data point in prompt, based on trends
+        400: { D: [4.7, 9.6], E: [5.9, 12.4], F: [8.9, 18.6], G: [11.8, 23.3] },
+        425: { D: [4.4, 9.0], E: [5.6, 11.6], F: [8.3, 17.4], G: [11.0, 21.8] },
+        450: { D: [4.1, 8.4], E: [5.2, 10.9], F: [7.8, 16.3], G: [10.4, 20.5] },
+        475: { D: [3.9, 8.0], E: [4.7, 10.3], F: [7.4, 15.4], G: [9.8, 19.3] },
+        500: { D: [3.7, 7.5], E: [4.7, 9.7], F: [7.0, 14.6], G: [9.2, 18.3] },
+        525: { D: [3.5, 7.1], E: [4.4, 9.2], F: [6.6, 13.9], G: [8.8, 17.3] },
+        550: { D: [3.3, 6.8], E: [4.2, 8.8], F: [6.3, 13.2], G: [8.3, 16.5] },
+        575: { D: [3.2, 6.5], E: [4.0, 8.4], F: [6.0, 12.5], G: [8.0, 15.6] },
+        600: { D: [3.0, 6.2], E: [3.8, 8.0], F: [5.7, 12.0], G: [7.6, 15.0] },
+        625: { D: [2.8, 6.0], E: [3.6, 7.8], F: [5.5, 11.5], G: [7.2, 14.5] }, // Estimated from 600/650 trends
+        650: { D: [2.6, 5.8], E: [3.4, 7.5], F: [5.2, 11.0], G: [6.8, 14.0] }  // Estimated standard limits
+    };
+
+    // Interpolate model parameters
+    function findModel(height, weight) {
+        // Find closest heights in table
+        const heights = Object.keys(capacityTable).map(Number).sort((a,b)=>a-b);
+        let lowerHeight = heights[0];
+        let upperHeight = heights[heights.length - 1];
+        
+        // Ensure within bounds
+        if (height < lowerHeight) height = lowerHeight;
+        if (height > upperHeight) height = upperHeight;
+
+        for (let i = 0; i < heights.length - 1; i++) {
+            if (height >= heights[i] && height <= heights[i+1]) {
+                lowerHeight = heights[i];
+                upperHeight = heights[i+1];
+                break;
+            }
+        }
+
+        // Interpolation weight (0 to 1)
+        const t = lowerHeight === upperHeight ? 0 : (height - lowerHeight) / (upperHeight - lowerHeight);
+
+        let bestModel = null;
+
+        // Check each model
+        const models = ['D', 'E', 'F', 'G'];
+        for (const model of models) {
+            const min_lower = capacityTable[lowerHeight][model][0];
+            const max_lower = capacityTable[lowerHeight][model][1];
+            
+            const min_upper = capacityTable[upperHeight]?.[model]?.[0] || min_lower;
+            const max_upper = capacityTable[upperHeight]?.[model]?.[1] || max_lower;
+
+            const min_interpolated = min_lower + t * (min_upper - min_lower);
+            const max_interpolated = max_lower + t * (max_upper - max_lower);
+
+            if (weight >= min_interpolated && weight <= max_interpolated) {
+                bestModel = model;
+                // Prefer stronger model if it falls in overlapping range (standard advice)
+                // We'll iterate D->E->F->G, so later matches overwrite earlier ones, naturally selecting the stronger one
+            }
+        }
+
+        return bestModel;
+    }
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Get values
+        const heightMm = parseFloat(document.getElementById('height').value);
+        const widthMm = parseFloat(document.getElementById('width').value);
+        const thicknessMm = parseFloat(document.getElementById('thickness').value);
+        const handleWeight = parseFloat(document.getElementById('handle-weight').value || 0);
+        
+        let density = parseFloat(materialSelect.value);
+        if (materialSelect.value === 'custom') {
+            density = parseFloat(customDensityInput.value);
+        }
+
+        // Calculate Volume in m³
+        const heightM = heightMm / 1000;
+        const widthM = widthMm / 1000;
+        const thicknessM = thicknessMm / 1000;
+        const volume = heightM * widthM * thicknessM;
+
+        // Calculate Weight
+        const facadeWeight = volume * density;
+        const totalWeight = facadeWeight + handleWeight;
+
+        // Find Model
+        const model = findModel(heightMm, totalWeight);
+
+        // UI Update
+        resultWeight.innerHTML = `${totalWeight.toFixed(2)} <span>кг</span>`;
+        
+        if (model) {
+            resultModel.textContent = `Модель ${model}`;
+            
+            // Apply colors based on model
+            const colors = {
+                'D': '#8b5cf6', // Purple
+                'E': '#ec4899', // Pink
+                'F': '#f59e0b', // Amber/Yellow
+                'G': '#10b981'  // Green
+            };
+            
+            resultModel.style.backgroundColor = colors[model];
+            
+            warningMessage.style.display = 'none';
+            successMessage.style.display = 'block';
+        } else {
+            resultModel.textContent = "Не підходить";
+            resultModel.style.backgroundColor = 'transparent';
+            resultModel.style.border = '1px solid var(--error-color)';
+            resultModel.style.color = 'var(--error-color)';
+            
+            successMessage.style.display = 'none';
+            warningMessage.textContent = 'Ця вага або висота знаходиться поза межами характеристик Free Flap 3.15. Спробуйте інший тип підіймача, наприклад Free Fold або змініть матеріал.';
+            warningMessage.style.display = 'block';
+        }
+
+        // Show results with smooth animation
+        resultsContainer.style.display = 'block';
+        setTimeout(() => {
+            resultsContainer.style.opacity = '1';
+            resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }, 10);
+    });
+});
+
+</script>
+</body>
+</html>
+

@@ -1,0 +1,24 @@
+{
+  "id": "пропро",
+  "title": "пропро",
+  "category": "constructive",
+  "icon": "FileText",
+  "content": [
+    {
+      "type": "header",
+      "value": "рпопро"
+    },
+    {
+      "type": "text",
+      "value": "прорпорпорпо"
+    },
+    {
+      "type": "warning",
+      "value": "пропро"
+    },
+    {
+      "type": "list",
+      "value": []
+    }
+  ]
+}
