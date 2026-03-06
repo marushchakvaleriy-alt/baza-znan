@@ -27,7 +27,7 @@ export function Handbook() {
     }, []);
 
     useEffect(() => {
-        let timer: NodeJS.Timeout;
+        let timer: ReturnType<typeof setTimeout>;
         if (loading) {
             timer = setTimeout(() => {
                 setShowSlowLoadingMessage(true);

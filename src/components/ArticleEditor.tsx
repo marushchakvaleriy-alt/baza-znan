@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, Plus, Image as ImageIcon, FileText, List, AlertTriangle, Save, Loader2, Trash2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Loader2, Trash2 } from 'lucide-react';
 import { Modal } from './ui/Modal';
 import type { ContentBlock, Article } from '../data/handbook';
 import { articleService } from '../services/articles';

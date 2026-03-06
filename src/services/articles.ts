@@ -6,7 +6,6 @@ import {
     setDoc,
     deleteDoc,
     query,
-    orderBy,
     Timestamp
 } from 'firebase/firestore';
 import {

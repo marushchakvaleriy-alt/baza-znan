@@ -1,4 +1,4 @@
-import { Article } from '../handbook';
+import type { Article } from '../handbook';
 
 export const ergonomicsArticle: Article = {
     id: 'schemes-ergonomics',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Ruler, Weight, ArrowDownToLine, Maximize2 } from 'lucide-react';
 import { cn } from '../Layout'; // Re-using the utility
 

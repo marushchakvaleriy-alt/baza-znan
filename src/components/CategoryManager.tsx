@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { categoryService, type Category } from '../services/categories';
-import { GripVertical, Plus, Edit, Trash2, Save, X } from 'lucide-react';
+import { GripVertical, Edit, Trash2, X, Save } from 'lucide-react';
 
 export function CategoryManager() {
     const [categories, setCategories] = useState<Category[]>([]);

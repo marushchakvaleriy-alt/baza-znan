@@ -1,4 +1,4 @@
-import * as Icons from 'lucide-react';
+ 
 
 export type ContentBlock = {
     type: 'text' | 'image' | 'warning' | 'list' | 'header';
