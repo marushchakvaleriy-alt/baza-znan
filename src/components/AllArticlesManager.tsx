@@ -93,78 +93,83 @@ export function AllArticlesManager() {
                 />
             </div>
 
-            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                <table className="w-full text-sm">
-                    <thead className="bg-slate-50 border-b border-slate-200">
-                        <tr>
-                            <th className="text-left px-4 py-3 font-semibold text-slate-600">Назва статті</th>
-                            <th className="text-left px-4 py-3 font-semibold text-slate-600 hidden lg:table-cell">Розділ</th>
-                            <th className="text-left px-4 py-3 font-semibold text-slate-600 hidden md:table-cell">Підгрупа</th>
-                            <th className="text-left px-4 py-3 font-semibold text-slate-600 hidden lg:table-cell">Під-підгрупа</th>
-                            <th className="px-4 py-3 w-32"></th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                        {filtered.map(article => {
-                            const sec = sections.find(s => s.id === article.sectionId);
-                            const cat = categories.find(c => c.id === article.category);
-                            const sub = subcategories.find(s => s.id === article.subcategoryId);
-                            return (
-                                <tr key={article.id} className="hover:bg-slate-50 transition">
-                                    <td className="px-4 py-3 font-medium text-slate-800">{article.title}</td>
-                                    <td className="px-4 py-3 text-slate-500 hidden lg:table-cell">
-                                        {sec ? (
-                                            <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">{sec.label}</span>
-                                        ) : (
-                                            <span className="text-slate-400 italic text-xs">Без розділу</span>
-                                        )}
-                                    </td>
-                                    <td className="px-4 py-3 hidden md:table-cell">
-                                        {cat ? (
-                                            <span className={`px-2 py-0.5 rounded text-xs ${cat.color}`}>{cat.label}</span>
-                                        ) : (
-                                            <span className="text-slate-400 italic text-xs">{article.category}</span>
-                                        )}
-                                    </td>
-                                    <td className="px-4 py-3 text-slate-500 hidden lg:table-cell">
-                                        {sub ? (
-                                            <span className={`px-2 py-0.5 rounded text-xs font-bold ${sub.color}`}>{sub.label}</span>
-                                        ) : (
-                                            <span className="text-slate-400 italic text-xs">-</span>
-                                        )}
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <div className="flex items-center gap-1 justify-end">
-                                            <button
-                                                onClick={() => openMoveModal(article)}
-                                                title="Перемістити до розділу"
-                                                className="text-purple-600 hover:bg-purple-50 p-1.5 rounded transition"
-                                            >
-                                                <Save size={15} />
-                                            </button>
-                                            <button
-                                                onClick={() => setEditingArticle(article)}
-                                                title="Редагувати"
-                                                className="text-blue-600 hover:bg-blue-50 p-1.5 rounded transition"
-                                            >
-                                                <Edit size={15} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(article)}
-                                                title="Видалити"
-                                                className="text-red-600 hover:bg-red-50 p-1.5 rounded transition"
-                                            >
-                                                <Trash2 size={15} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                <div className="overflow-x-auto scrollbar-thin">
+                    <table className="w-full text-sm">
+                        <thead className="bg-slate-50 border-b border-slate-200">
+                            <tr>
+                                <th className="text-left px-4 py-4 font-semibold text-slate-600 min-w-[200px]">Назва статті</th>
+                                <th className="text-left px-4 py-4 font-semibold text-slate-600 hidden lg:table-cell whitespace-nowrap">Розділ</th>
+                                <th className="text-left px-4 py-4 font-semibold text-slate-600 hidden md:table-cell whitespace-nowrap">Підгрупа</th>
+                                <th className="text-left px-4 py-4 font-semibold text-slate-600 hidden lg:table-cell whitespace-nowrap">Під-підгрупа</th>
+                                <th className="px-4 py-4 w-32 sticky right-0 bg-slate-50 border-l border-slate-200 lg:static lg:border-none">Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                            {filtered.map(article => {
+                                const sec = sections.find(s => s.id === article.sectionId);
+                                const cat = categories.find(c => c.id === article.category);
+                                const sub = subcategories.find(s => s.id === article.subcategoryId);
+                                return (
+                                    <tr key={article.id} className="hover:bg-slate-50 transition active:bg-slate-100">
+                                        <td className="px-4 py-4 font-medium text-slate-800 leading-snug">{article.title}</td>
+                                        <td className="px-4 py-4 text-slate-500 hidden lg:table-cell whitespace-nowrap font-medium">
+                                            {sec ? (
+                                                <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-[10px] uppercase tracking-wider">{sec.label}</span>
+                                            ) : (
+                                                <span className="text-slate-400 italic text-[10px]">Без розділу</span>
+                                            )}
+                                        </td>
+                                        <td className="px-4 py-4 hidden md:table-cell whitespace-nowrap">
+                                            {cat ? (
+                                                <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${cat.color} opacity-90`}>{cat.label}</span>
+                                            ) : (
+                                                <span className="text-slate-400 italic text-[10px]">{article.category}</span>
+                                            )}
+                                        </td>
+                                        <td className="px-4 py-4 text-slate-500 hidden lg:table-cell whitespace-nowrap">
+                                            {sub ? (
+                                                <span className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest ${sub.color}`}>{sub.label}</span>
+                                            ) : (
+                                                <span className="text-slate-400 italic text-[10px]">-</span>
+                                            )}
+                                        </td>
+                                        <td className="px-4 py-4 sticky right-0 bg-white/95 backdrop-blur-sm border-l border-slate-100 lg:static lg:border-none lg:bg-transparent transition-colors group-hover:bg-slate-50">
+                                            <div className="flex items-center gap-1.5 justify-end">
+                                                <button
+                                                    onClick={() => openMoveModal(article)}
+                                                    title="Перемістити"
+                                                    className="text-purple-600 hover:bg-purple-100 p-2 rounded-lg transition active:scale-90"
+                                                >
+                                                    <Save size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => setEditingArticle(article)}
+                                                    title="Редагувати"
+                                                    className="text-blue-600 hover:bg-blue-100 p-2 rounded-lg transition active:scale-90"
+                                                >
+                                                    <Edit size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(article)}
+                                                    title="Видалити"
+                                                    className="text-red-500 hover:bg-red-100 p-2 rounded-lg transition active:scale-90"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
                 {filtered.length === 0 && (
-                    <div className="py-12 text-center text-slate-400">Статей не знайдено</div>
+                    <div className="py-20 text-center text-slate-400 flex flex-col items-center gap-2">
+                        <Search size={40} className="text-slate-200" />
+                        <p className="text-sm font-medium">Статей не знайдено</p>
+                    </div>
                 )}
             </div>
 

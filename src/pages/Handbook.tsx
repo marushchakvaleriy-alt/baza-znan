@@ -168,43 +168,48 @@ export function Handbook() {
     }
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-4 md:space-y-8">
             {/* Header */}
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-                <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-                        <BookOpen className="text-purple-600" /> {section?.label || 'База Знань'}
+            <div className="bg-white p-4 md:p-8 rounded-xl md:rounded-2xl shadow-sm border border-slate-100">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900 flex items-center gap-3">
+                        <BookOpen className="text-purple-600 shrink-0" /> 
+                        <span className="truncate">{section?.label || 'База Знань'}</span>
                     </h1>
                     {isAdmin && (
                         <button
                             onClick={() => setShowEditor(true)}
-                            className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-purple-600 text-white px-4 py-2.5 rounded-xl hover:bg-purple-700 transition shadow-lg shadow-purple-200 active:scale-95"
                         >
                             <Plus size={20} />
-                            Створити статтю
+                            <span className="font-medium text-sm">Створити статтю</span>
                         </button>
                     )}
                 </div>
-                <p className="text-slate-500 mb-6">Корисні матеріали, стандарти та чек-листи для конструктора.</p>
+                <p className="text-sm md:text-base text-slate-500 mb-6 leading-relaxed">Корисні матеріали, стандарти та чек-листи для конструктора.</p>
 
-                <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex flex-col lg:flex-row gap-4">
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                         <input
                             type="text"
                             placeholder="Пошук статті..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none"
+                            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none text-sm transition-all focus:bg-white"
                         />
                     </div>
-                    <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
+                    <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide -mx-2 px-2 sm:mx-0 sm:px-0">
                         <button
                             onClick={() => {
                                 setFilter('all');
                                 setSubFilter('all');
                             }}
-                            className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${filter === 'all' ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                            className={`px-4 py-2 rounded-xl whitespace-nowrap transition-all text-sm font-medium border ${
+                                filter === 'all' 
+                                    ? 'bg-purple-600 text-white border-purple-600 shadow-md shadow-purple-100' 
+                                    : 'bg-white text-slate-600 border-slate-200 hover:border-purple-300 hover:text-purple-600'
+                            }`}
                         >
                             Всі
                         </button>
@@ -215,7 +220,11 @@ export function Handbook() {
                                     setFilter(category.id);
                                     setSubFilter('all');
                                 }}
-                                className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${filter === category.id ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                                className={`px-4 py-2 rounded-xl whitespace-nowrap transition-all text-sm font-medium border ${
+                                    filter === category.id 
+                                        ? 'bg-purple-600 text-white border-purple-600 shadow-md shadow-purple-100' 
+                                        : 'bg-white text-slate-600 border-slate-200 hover:border-purple-300 hover:text-purple-600'
+                                }`}
                             >
                                 {category.label}
                             </button>
@@ -225,10 +234,14 @@ export function Handbook() {
 
                 {/* Sub-tabs for sub-subcategories */}
                 {filter !== 'all' && (
-                    <div className="flex gap-2 overflow-x-auto mt-4 pt-4 border-t border-slate-50">
+                    <div className="flex gap-2 overflow-x-auto mt-4 pt-4 border-t border-slate-100 scrollbar-hide -mx-2 px-2 sm:mx-0 sm:px-0">
                         <button
                             onClick={() => setSubFilter('all')}
-                            className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors ${subFilter === 'all' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                            className={`px-3 py-1.5 rounded-full text-[10px] font-bold whitespace-nowrap transition-all border ${
+                                subFilter === 'all' 
+                                    ? 'bg-slate-800 text-white border-slate-800' 
+                                    : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+                            }`}
                         >
                             ВСІ ПІД-КАТЕГОРІЇ
                         </button>
@@ -238,7 +251,11 @@ export function Handbook() {
                                 <button
                                     key={sub.id}
                                     onClick={() => setSubFilter(sub.id)}
-                                    className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors ${subFilter === sub.id ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                                    className={`px-3 py-1.5 rounded-full text-[10px] font-bold whitespace-nowrap transition-all border ${
+                                        subFilter === sub.id 
+                                            ? 'bg-purple-600 text-white border-purple-600' 
+                                            : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'
+                                    }`}
                                 >
                                     {sub.label.toUpperCase()}
                                 </button>
@@ -304,7 +321,7 @@ export function Handbook() {
                 onClose={() => setSelectedArticle(null)}
                 title={selectedArticle?.title || ''}
             >
-                {selectedArticle && (
+                {selectedArticle && selectedArticle.content && (
                     <div className="space-y-6">
                         {selectedArticle.content.map((block, idx) => {
                             switch (block.type) {

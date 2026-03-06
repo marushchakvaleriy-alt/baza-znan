@@ -23,8 +23,9 @@ export function Sidebar() {
         <>
             {/* Mobile Toggle */}
             <button
-                className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg"
+                className="md:hidden fixed top-4 right-4 z-50 p-2.5 bg-slate-900 text-white rounded-xl shadow-xl border border-slate-700 active:scale-95 transition-transform"
                 onClick={() => setIsOpen(!isOpen)}
+                aria-label="Toggle menu"
             >
                 {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -32,22 +33,31 @@ export function Sidebar() {
             {/* Sidebar Overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
                     onClick={() => setIsOpen(false)}
                 />
             )}
 
             {/* Sidebar Content */}
             <aside className={cn(
-                "fixed top-0 left-0 h-full w-64 bg-slate-900 text-white z-40 transition-transform duration-300 md:translate-x-0 pt-16 md:pt-0 flex flex-col",
+                "fixed top-0 left-0 h-full w-72 bg-slate-900 text-white z-40 transition-transform duration-300 md:translate-x-0 flex flex-col shadow-2xl md:shadow-none",
                 isOpen ? "translate-x-0" : "-translate-x-full"
             )}>
-                <div className="p-6 border-b border-slate-800 shrink-0">
-                    <h1 className="text-xl font-bold flex items-center gap-2">
-                        <BookOpen className="text-blue-500" />
-                        <span>База Знань</span>
-                    </h1>
-                    <p className="text-xs text-slate-400 mt-1">Довідник Проєктанта ВіЯр</p>
+                <div className="p-6 border-b border-slate-800 shrink-0 flex justify-between items-center">
+                    <div>
+                        <h1 className="text-xl font-bold flex items-center gap-2">
+                            <BookOpen className="text-blue-500" />
+                            <span>База Знань</span>
+                        </h1>
+                        <p className="text-[10px] text-slate-400 mt-0.5 uppercase tracking-widest">Довідник ВіЯр</p>
+                    </div>
+                    {/* Inner Close Button for Mobile */}
+                    <button 
+                        onClick={() => setIsOpen(false)}
+                        className="md:hidden p-2 hover:bg-slate-800 rounded-lg text-slate-400"
+                    >
+                        <X size={20} />
+                    </button>
                 </div>
 
                 <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
