@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { SectionManager } from '../components/SectionManager';
 import { CategoryManager } from '../components/CategoryManager';
+import { AllArticlesManager } from '../components/AllArticlesManager';
 import { LayoutDashboard, FolderTree, FileText } from 'lucide-react';
 
 export function AdminDashboard() {
@@ -52,12 +53,7 @@ export function AdminDashboard() {
             <div className="mt-6">
                 {activeTab === 'sections' && <SectionManager />}
                 {activeTab === 'categories' && <CategoryManager />}
-                {activeTab === 'articles' && (
-                    <div className="bg-white p-6 rounded-xl border border-slate-200 text-center text-slate-500">
-                        <p>Щоб керувати статтями, перейдіть до відповідного розділу меню зліва.</p>
-                        <p className="text-sm mt-2">Або можете додати сюди загальну таблицю всіх статей пізніше.</p>
-                    </div>
-                )}
+                {activeTab === 'articles' && <AllArticlesManager />}
             </div>
         </div>
     );
