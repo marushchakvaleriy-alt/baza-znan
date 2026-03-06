@@ -274,6 +274,7 @@ export function Handbook() {
             <ArticleEditor
                 isOpen={showEditor}
                 article={articleToEdit}
+                defaultSectionId={sectionId}
                 onClose={() => {
                     setShowEditor(false);
                     setArticleToEdit(undefined); // Reset edit mode

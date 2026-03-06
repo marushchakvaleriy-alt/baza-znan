@@ -4,20 +4,24 @@ import { Modal } from './ui/Modal';
 import type { ContentBlock, Article } from '../data/handbook';
 import { articleService } from '../services/articles';
 import { categoryService, type Category } from '../services/categories';
+import { sectionService, type Section } from '../services/sections';
 
 interface ArticleEditorProps {
     isOpen: boolean;
     onClose: () => void;
     article?: Article; // Optional article for edit mode
+    defaultSectionId?: string; // Pre-select section when creating from a section page
 }
 
-export function ArticleEditor({ isOpen, onClose, article }: ArticleEditorProps) {
+export function ArticleEditor({ isOpen, onClose, article, defaultSectionId }: ArticleEditorProps) {
     const [title, setTitle] = useState('');
     const [category, setCategory] = useState('general');
+    const [sectionId, setSectionId] = useState(defaultSectionId || '');
     const [icon, setIcon] = useState('FileText');
     const [blocks, setBlocks] = useState<ContentBlock[]>([]);
     const [saving, setSaving] = useState(false);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [sections, setSections] = useState<Section[]>([]);
 
     // Load categories on mount
     useEffect(() => {
@@ -26,11 +30,15 @@ export function ArticleEditor({ isOpen, onClose, article }: ArticleEditorProps) 
 
     const loadCategories = async () => {
         try {
-            const data = await categoryService.getAll();
-            setCategories(data);
+            const [catData, secData] = await Promise.all([
+                categoryService.getAll(),
+                sectionService.getAll()
+            ]);
+            setCategories(catData);
+            setSections(secData);
             // Set default category if none selected
-            if (!category && data.length > 0) {
-                setCategory(data[0].id);
+            if (!category && catData.length > 0) {
+                setCategory(catData[0].id);
             }
         } catch (err: any) {
             console.error('Error loading categories:', err);
@@ -42,12 +50,14 @@ export function ArticleEditor({ isOpen, onClose, article }: ArticleEditorProps) 
         if (article) {
             setTitle(article.title);
             setCategory(article.category);
+            setSectionId(article.sectionId || defaultSectionId || '');
             setIcon(article.icon || 'FileText');
             setBlocks(article.content || []);
         } else {
             // Reset form when creating new article
             setTitle('');
             setCategory(categories.length > 0 ? categories[0].id : 'general');
+            setSectionId(defaultSectionId || '');
             setIcon('FileText');
             setBlocks([]);
         }
@@ -84,6 +94,7 @@ export function ArticleEditor({ isOpen, onClose, article }: ArticleEditorProps) 
             id: articleId,
             title,
             category,
+            sectionId: sectionId || undefined,
             icon,
             content: blocks,
             order: article?.order || Date.now() // Preserve order or set new
@@ -117,17 +128,34 @@ export function ArticleEditor({ isOpen, onClose, article }: ArticleEditorProps) 
                     />
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Категорія</label>
-                    <select
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value as any)}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
-                    >
-                        {categories.map(cat => (
-                            <option key={cat.id} value={cat.id}>{cat.label}</option>
-                        ))}
-                    </select>
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Розділ</label>
+                        <select
+                            value={sectionId}
+                            onChange={(e) => setSectionId(e.target.value)}
+                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                        >
+                            <option value="">Не визначено</option>
+                            {sections.map(sec => (
+                                <option key={sec.id} value={sec.id}>{sec.label}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Підгрупа (категорія)</label>
+                        <select
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value as any)}
+                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                        >
+                            {categories
+                                .filter(cat => !sectionId || cat.sectionId === sectionId)
+                                .map(cat => (
+                                    <option key={cat.id} value={cat.id}>{cat.label}</option>
+                                ))}
+                        </select>
+                    </div>
                 </div>
 
                 {/* Блоки контенту */}
