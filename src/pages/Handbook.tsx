@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { articleService } from '../services/articles';
 import { categoryService, type Category } from '../services/categories';
 import { sectionService, type Section } from '../services/sections';
+import { subcategoryService, type Subcategory } from '../services/subcategories';
 
 export function Handbook() {
     const { sectionId } = useParams<{ sectionId: string }>();
@@ -21,6 +22,8 @@ export function Handbook() {
 
     const [articles, setArticles] = useState<Article[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
+    const [subFilter, setSubFilter] = useState('all');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [showSlowLoadingMessage, setShowSlowLoadingMessage] = useState(false);
@@ -29,6 +32,7 @@ export function Handbook() {
         setFilter('all'); // Reset filter when section changes
         loadArticles();
         loadCategories();
+        loadSubcategories();
         if (sectionId) {
             sectionService.getById(sectionId).then(setSection).catch(console.error);
         }
@@ -45,6 +49,15 @@ export function Handbook() {
         }
         return () => clearTimeout(timer);
     }, [loading]);
+
+    const loadSubcategories = async () => {
+        try {
+            const data = await subcategoryService.getAll();
+            setSubcategories(data);
+        } catch (err: any) {
+            console.error('Error loading subcategories:', err);
+        }
+    };
 
     const loadArticles = async () => {
         try {
@@ -77,9 +90,12 @@ export function Handbook() {
     const filtered = articles.filter(a => {
         // Filter by current section
         if (sectionId && a.sectionId !== sectionId) return false;
+        
         const matchesCategory = filter === 'all' || a.category === filter;
+        const matchesSubcategory = subFilter === 'all' || a.subcategoryId === subFilter;
         const matchesSearch = a.title.toLowerCase().includes(search.toLowerCase());
-        return matchesCategory && matchesSearch;
+        
+        return matchesCategory && matchesSubcategory && matchesSearch;
     });
 
     // Only show categories that belong to this section
@@ -171,7 +187,10 @@ export function Handbook() {
                     </div>
                     <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
                         <button
-                            onClick={() => setFilter('all')}
+                            onClick={() => {
+                                setFilter('all');
+                                setSubFilter('all');
+                            }}
                             className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${filter === 'all' ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                         >
                             Всі
@@ -179,7 +198,10 @@ export function Handbook() {
                         {sectionCategories.map(category => (
                             <button
                                 key={category.id}
-                                onClick={() => setFilter(category.id)}
+                                onClick={() => {
+                                    setFilter(category.id);
+                                    setSubFilter('all');
+                                }}
                                 className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${filter === category.id ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                             >
                                 {category.label}
@@ -187,6 +209,29 @@ export function Handbook() {
                         ))}
                     </div>
                 </div>
+
+                {/* Sub-tabs for sub-subcategories */}
+                {filter !== 'all' && (
+                    <div className="flex gap-2 overflow-x-auto mt-4 pt-4 border-t border-slate-50">
+                        <button
+                            onClick={() => setSubFilter('all')}
+                            className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors ${subFilter === 'all' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                        >
+                            ВСІ ПІД-КАТЕГОРІЇ
+                        </button>
+                        {subcategories
+                            .filter(sub => sub.parentCategoryId === filter)
+                            .map(sub => (
+                                <button
+                                    key={sub.id}
+                                    onClick={() => setSubFilter(sub.id)}
+                                    className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors ${subFilter === sub.id ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                                >
+                                    {sub.label.toUpperCase()}
+                                </button>
+                            ))}
+                    </div>
+                )}
             </div>
 
             {/* Grid */}

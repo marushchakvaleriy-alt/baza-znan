@@ -5,6 +5,7 @@ import type { ContentBlock, Article } from '../data/handbook';
 import { articleService } from '../services/articles';
 import { categoryService, type Category } from '../services/categories';
 import { sectionService, type Section } from '../services/sections';
+import { subcategoryService, type Subcategory } from '../services/subcategories';
 
 interface ArticleEditorProps {
     isOpen: boolean;
@@ -17,11 +18,13 @@ export function ArticleEditor({ isOpen, onClose, article, defaultSectionId }: Ar
     const [title, setTitle] = useState('');
     const [category, setCategory] = useState('general');
     const [sectionId, setSectionId] = useState(defaultSectionId || '');
+    const [subcategoryId, setSubcategoryId] = useState('');
     const [icon, setIcon] = useState('FileText');
     const [blocks, setBlocks] = useState<ContentBlock[]>([]);
     const [saving, setSaving] = useState(false);
     const [categories, setCategories] = useState<Category[]>([]);
     const [sections, setSections] = useState<Section[]>([]);
+    const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
 
     // Load categories on mount
     useEffect(() => {
@@ -30,12 +33,14 @@ export function ArticleEditor({ isOpen, onClose, article, defaultSectionId }: Ar
 
     const loadCategories = async () => {
         try {
-            const [catData, secData] = await Promise.all([
+            const [catData, secData, subData] = await Promise.all([
                 categoryService.getAll(),
-                sectionService.getAll()
+                sectionService.getAll(),
+                subcategoryService.getAll()
             ]);
             setCategories(catData);
             setSections(secData);
+            setSubcategories(subData);
             // Set default category if none selected
             if (!category && catData.length > 0) {
                 setCategory(catData[0].id);
@@ -51,6 +56,7 @@ export function ArticleEditor({ isOpen, onClose, article, defaultSectionId }: Ar
             setTitle(article.title);
             setCategory(article.category);
             setSectionId(article.sectionId || defaultSectionId || '');
+            setSubcategoryId(article.subcategoryId || '');
             setIcon(article.icon || 'FileText');
             setBlocks(article.content || []);
         } else {
@@ -58,6 +64,7 @@ export function ArticleEditor({ isOpen, onClose, article, defaultSectionId }: Ar
             setTitle('');
             setCategory(categories.length > 0 ? categories[0].id : 'general');
             setSectionId(defaultSectionId || '');
+            setSubcategoryId('');
             setIcon('FileText');
             setBlocks([]);
         }
@@ -95,9 +102,10 @@ export function ArticleEditor({ isOpen, onClose, article, defaultSectionId }: Ar
             title,
             category,
             sectionId: sectionId || undefined,
+            subcategoryId: subcategoryId || undefined,
             icon,
             content: blocks,
-            order: article?.order || Date.now() // Preserve order or set new
+            order: article?.order || Date.now()
         };
 
         setSaving(true);
@@ -128,12 +136,16 @@ export function ArticleEditor({ isOpen, onClose, article, defaultSectionId }: Ar
                     />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">Розділ</label>
                         <select
                             value={sectionId}
-                            onChange={(e) => setSectionId(e.target.value)}
+                            onChange={(e) => {
+                                setSectionId(e.target.value);
+                                setCategory(''); // Reset dependant fields
+                                setSubcategoryId('');
+                            }}
                             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
                         >
                             <option value="">Не визначено</option>
@@ -146,13 +158,32 @@ export function ArticleEditor({ isOpen, onClose, article, defaultSectionId }: Ar
                         <label className="block text-sm font-medium text-slate-700 mb-1">Підгрупа (категорія)</label>
                         <select
                             value={category}
-                            onChange={(e) => setCategory(e.target.value as any)}
+                            onChange={(e) => {
+                                setCategory(e.target.value);
+                                setSubcategoryId(''); // Reset subcategory
+                            }}
                             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
                         >
+                            <option value="">Виберіть підгрупу...</option>
                             {categories
                                 .filter(cat => !sectionId || cat.sectionId === sectionId)
                                 .map(cat => (
                                     <option key={cat.id} value={cat.id}>{cat.label}</option>
+                                ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Під-підгрупа</label>
+                        <select
+                            value={subcategoryId}
+                            onChange={(e) => setSubcategoryId(e.target.value)}
+                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                        >
+                            <option value="">Немає</option>
+                            {subcategories
+                                .filter(sub => !category || sub.parentCategoryId === category)
+                                .map(sub => (
+                                    <option key={sub.id} value={sub.id}>{sub.label}</option>
                                 ))}
                         </select>
                     </div>

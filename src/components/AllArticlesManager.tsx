@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { articleService } from '../services/articles';
 import { sectionService, type Section } from '../services/sections';
 import { categoryService, type Category } from '../services/categories';
+import { subcategoryService, type Subcategory } from '../services/subcategories';
 import type { Article } from '../data/handbook';
 import { Edit, Trash2, Save, Search } from 'lucide-react';
 import { ArticleEditor } from './ArticleEditor';
@@ -11,12 +12,14 @@ export function AllArticlesManager() {
     const [articles, setArticles] = useState<Article[]>([]);
     const [sections, setSections] = useState<Section[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [editingArticle, setEditingArticle] = useState<Article | null>(null);
     const [moveModal, setMoveModal] = useState<Article | null>(null);
     const [moveSection, setMoveSection] = useState('');
     const [moveCategory, setMoveCategory] = useState('');
+    const [moveSubcategory, setMoveSubcategory] = useState('');
 
     useEffect(() => {
         load();
@@ -25,14 +28,16 @@ export function AllArticlesManager() {
     const load = async () => {
         setLoading(true);
         try {
-            const [arts, secs, cats] = await Promise.all([
+            const [arts, secs, cats, subs] = await Promise.all([
                 articleService.getAll(),
                 sectionService.getAll(),
                 categoryService.getAll(),
+                subcategoryService.getAll(),
             ]);
             setArticles(arts);
             setSections(secs);
             setCategories(cats);
+            setSubcategories(subs);
         } catch (e) {
             console.error(e);
         } finally {
@@ -50,12 +55,18 @@ export function AllArticlesManager() {
         setMoveModal(article);
         setMoveSection(article.sectionId || '');
         setMoveCategory(article.category || '');
+        setMoveSubcategory(article.subcategoryId || '');
     };
 
     const handleMove = async () => {
         if (!moveModal) return;
         try {
-            await articleService.save({ ...moveModal, sectionId: moveSection || undefined, category: moveCategory });
+            await articleService.save({ 
+                ...moveModal, 
+                sectionId: moveSection || undefined, 
+                category: moveCategory,
+                subcategoryId: moveSubcategory || undefined
+            });
             setMoveModal(null);
             load();
         } catch (e: any) {
@@ -87,8 +98,9 @@ export function AllArticlesManager() {
                     <thead className="bg-slate-50 border-b border-slate-200">
                         <tr>
                             <th className="text-left px-4 py-3 font-semibold text-slate-600">Назва статті</th>
-                            <th className="text-left px-4 py-3 font-semibold text-slate-600 hidden md:table-cell">Розділ</th>
+                            <th className="text-left px-4 py-3 font-semibold text-slate-600 hidden lg:table-cell">Розділ</th>
                             <th className="text-left px-4 py-3 font-semibold text-slate-600 hidden md:table-cell">Підгрупа</th>
+                            <th className="text-left px-4 py-3 font-semibold text-slate-600 hidden lg:table-cell">Під-підгрупа</th>
                             <th className="px-4 py-3 w-32"></th>
                         </tr>
                     </thead>
@@ -96,10 +108,11 @@ export function AllArticlesManager() {
                         {filtered.map(article => {
                             const sec = sections.find(s => s.id === article.sectionId);
                             const cat = categories.find(c => c.id === article.category);
+                            const sub = subcategories.find(s => s.id === article.subcategoryId);
                             return (
                                 <tr key={article.id} className="hover:bg-slate-50 transition">
                                     <td className="px-4 py-3 font-medium text-slate-800">{article.title}</td>
-                                    <td className="px-4 py-3 text-slate-500 hidden md:table-cell">
+                                    <td className="px-4 py-3 text-slate-500 hidden lg:table-cell">
                                         {sec ? (
                                             <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">{sec.label}</span>
                                         ) : (
@@ -111,6 +124,13 @@ export function AllArticlesManager() {
                                             <span className={`px-2 py-0.5 rounded text-xs ${cat.color}`}>{cat.label}</span>
                                         ) : (
                                             <span className="text-slate-400 italic text-xs">{article.category}</span>
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-3 text-slate-500 hidden lg:table-cell">
+                                        {sub ? (
+                                            <span className={`px-2 py-0.5 rounded text-xs font-bold ${sub.color}`}>{sub.label}</span>
+                                        ) : (
+                                            <span className="text-slate-400 italic text-xs">-</span>
                                         )}
                                     </td>
                                     <td className="px-4 py-3">
@@ -167,13 +187,26 @@ export function AllArticlesManager() {
                         <label className="block text-sm font-medium text-slate-700 mb-1">Підгрупа (категорія)</label>
                         <select
                             value={moveCategory}
-                            onChange={e => setMoveCategory(e.target.value)}
+                            onChange={e => { setMoveCategory(e.target.value); setMoveSubcategory(''); }}
                             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
                         >
                             <option value="">Оберіть підгрупу...</option>
                             {categories
                                 .filter(c => !moveSection || c.sectionId === moveSection)
                                 .map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Під-підгрупа</label>
+                        <select
+                            value={moveSubcategory}
+                            onChange={e => setMoveSubcategory(e.target.value)}
+                            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                        >
+                            <option value="">Немає</option>
+                            {subcategories
+                                .filter(s => !moveCategory || s.parentCategoryId === moveCategory)
+                                .map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
                         </select>
                     </div>
                     <div className="flex gap-2 pt-2">

@@ -9,7 +9,8 @@ export type Article = {
     id: string;
     sectionId?: string;
     title: string;
-    category: string;
+    category: string;       // parentCategoryId (підгрупа)
+    subcategoryId?: string; // під-підгрупа
     icon?: any;
     order?: number; // Для сортування
     content: ContentBlock[];
